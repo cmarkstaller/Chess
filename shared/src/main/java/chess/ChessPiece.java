@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -10,15 +11,13 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private final PieceType piece;
-    private final ChessGame.TeamColor color;
+    private final ChessGame.TeamColor pieceColor;
+    private final PieceType type;
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+        this.pieceColor = pieceColor;
+        this.type = type;
+    }
 
-    }
-    public ChessPiece(PieceType piece, ChessGame.TeamColor color) {
-        this.piece = piece;
-        this.color = color;
-    }
     /**
      * The various different chess piece options
      */
@@ -35,15 +34,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return(this.color);
+        return(this.pieceColor);
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-
-        return(this.piece);
+        return(this.type);
     }
 
     /**
@@ -57,6 +55,26 @@ public class ChessPiece {
         return new ArrayList<>();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "pieceColor=" + pieceColor +
+                ", type=" + type +
+                '}';
+    }
 }
 
 
