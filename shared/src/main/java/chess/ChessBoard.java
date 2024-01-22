@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Arrays;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -38,6 +40,33 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        this.squares[1][0] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        this.squares[1][1] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        this.squares[1][2] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        this.squares[1][3] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        this.squares[1][4] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        this.squares[1][5] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        this.squares[1][6] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        this.squares[1][7] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessBoard that = (ChessBoard) o;
+        return Arrays.deepEquals(squares, that.squares);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(squares);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessBoard{" +
+                "squares=" + Arrays.deepToString(squares) +
+                '}';
     }
 }

@@ -10,10 +10,15 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessPiece {
-
+    private final PieceType piece;
+    private final ChessGame.TeamColor color;
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-    }
 
+    }
+    public ChessPiece(PieceType piece, ChessGame.TeamColor color) {
+        this.piece = piece;
+        this.color = color;
+    }
     /**
      * The various different chess piece options
      */
@@ -30,14 +35,15 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        throw new RuntimeException("Not implemented");
+        return(this.color);
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        throw new RuntimeException("Not implemented");
+
+        return(this.piece);
     }
 
     /**
@@ -50,4 +56,7 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         return new ArrayList<>();
     }
+
 }
+
+
