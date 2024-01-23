@@ -64,6 +64,10 @@ public class ChessPiece {
             RookCalculator moveRook = new RookCalculator(board, myPosition, this.getTeamColor());
             return(moveRook.checkMoves());
         }
+        else if (this.getPieceType() == PieceType.BISHOP) {
+            BishopCalculator moveBishop = new BishopCalculator(board, myPosition, this.getTeamColor());
+            return(moveBishop.checkMoves());
+        }
         return(new ArrayList<>());
     }
 
