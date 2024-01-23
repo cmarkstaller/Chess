@@ -52,7 +52,11 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return new ArrayList<>();
+        if (this.getPieceType() == PieceType.KING) {
+            KingCalculator moveKing = new KingCalculator(board, myPosition, this.getTeamColor());
+            return(moveKing.checkMoves());
+        }
+        return(new ArrayList<>());
     }
 
     @Override

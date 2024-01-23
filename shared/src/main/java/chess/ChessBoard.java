@@ -40,14 +40,8 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        this.squares[1][0] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-        this.squares[1][1] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-        this.squares[1][2] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-        this.squares[1][3] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-        this.squares[1][4] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-        this.squares[1][5] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-        this.squares[1][6] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
-        this.squares[1][7] = new ChessPiece(ChessPiece.PieceType.PAWN, ChessGame.TeamColor.WHITE);
+        this.squares[1][0] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+
     }
 
     @Override
