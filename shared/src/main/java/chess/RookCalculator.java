@@ -13,22 +13,56 @@ public class RookCalculator extends MasterPieceCalculator{
         boolean south = true;
         boolean west = true;
 
-        for(int i = 0; i < 8; i += 1) {
+        for(int i = 1; i < 8; i += 1) {
             if (north) {
                 if (validMove(row + i, col, this.board)) {
                     this.moves.add(new ChessMove(this.pos, new ChessPosition(this.row + i, this.col), null));
 
-                    /*
                     if (capturePiece(row + i, col, this.board)) {
                         north = false;
                     }
-
-                     */
                 }
                 else {
                     north = false;
                 }
             }
+            if (east) {
+                if (validMove(row, col + i, this.board)) {
+                    this.moves.add(new ChessMove(this.pos, new ChessPosition(this.row, this.col + i), null));
+
+                    if (capturePiece(row, col + i, this.board)) {
+                        east = false;
+                    }
+                }
+                else {
+                    east = false;
+                }
+            }
+            if (south) {
+                if (validMove(row - i, col, this.board)) {
+                    this.moves.add(new ChessMove(this.pos, new ChessPosition(this.row - i, this.col), null));
+
+                    if (capturePiece(row - i, col, this.board)) {
+                        south = false;
+                    }
+                }
+                else {
+                    south = false;
+                }
+            }
+            if (west) {
+                if (validMove(row, col - i, this.board)) {
+                    this.moves.add(new ChessMove(this.pos, new ChessPosition(this.row, this.col - i), null));
+
+                    if (capturePiece(row, col - i, this.board)) {
+                        west = false;
+                    }
+                }
+                else {
+                    west = false;
+                }
+            }
+
         }
         return(this.moves);
     }
