@@ -20,7 +20,7 @@ public abstract class MasterPieceCalculator {
         this.color = color;
     }
     public boolean inBounds(int row, int col) {
-        return row >= 0 && row <= 7 && col >= 0 && col <= 7;
+        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
 
     public boolean noCollision(int row, int col, ChessBoard board) {
