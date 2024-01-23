@@ -68,6 +68,10 @@ public class ChessPiece {
             BishopCalculator moveBishop = new BishopCalculator(board, myPosition, this.getTeamColor());
             return(moveBishop.checkMoves());
         }
+        else if (this.getPieceType() == PieceType.QUEEN) {
+            QueenCalculator moveQueen = new QueenCalculator(board, myPosition, this.getTeamColor());
+            return(moveQueen.checkMoves());
+        }
         return(new ArrayList<>());
     }
 
