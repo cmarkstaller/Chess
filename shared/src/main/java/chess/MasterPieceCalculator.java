@@ -30,6 +30,13 @@ public abstract class MasterPieceCalculator {
         else return(true);
     }
 
+    public boolean capturePiece(int row, int col, ChessBoard board) {
+        if(board.getPiece(new ChessPosition(row, col)) != null) {
+            return this.color != board.getPiece(new ChessPosition(row, col)).getTeamColor();
+        }
+        return(false);
+    }
+
     public boolean validMove(int row, int col, ChessBoard board) {
         if (inBounds(row, col)){
             return(noCollision(row, col, board));

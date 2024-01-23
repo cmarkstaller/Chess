@@ -60,6 +60,10 @@ public class ChessPiece {
             KnightCalculator moveKnight = new KnightCalculator(board, myPosition, this.getTeamColor());
             return(moveKnight.checkMoves());
         }
+        else if (this.getPieceType() == PieceType.ROOK) {
+            RookCalculator moveRook = new RookCalculator(board, myPosition, this.getTeamColor());
+            return(moveRook.checkMoves());
+        }
         return(new ArrayList<>());
     }
 
