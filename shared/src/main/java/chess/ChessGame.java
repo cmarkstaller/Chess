@@ -55,13 +55,15 @@ public class ChessGame {
      */
     // Runs piece moves on position it passes in, Don't check for team Color.
     // Take care of the case that the given space is null.
-    public Collection<ChessMove> allValidMoves() {
+    public Collection<ChessMove> allValidMoves(TeamColor color) {
         Collection<ChessMove> allMoves = new ArrayList<>();
         for (int i = 1; i <= 8; i += 1) {
             //Col
             for (int j = 1; j <= 8; j += 1) {
                 if (this.board.getPiece(new ChessPosition(i, j)) != null) {
-                    allMoves.addAll(this.validMoves(new ChessPosition(i, j)));
+                    if (this.board.getPiece(new ChessPosition(i, j)).getTeamColor() == color) {
+                        allMoves.addAll(this.validMoves(new ChessPosition(i, j)));
+                    }
                 }
             }
         }
@@ -157,7 +159,8 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return(this.isInCheck(teamColor) && this.isInStalemate(teamColor));
+
     }
 
     /**
@@ -168,7 +171,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if (this.allValidMoves().isEmpty()) {
+        if (this.allValidMoves(teamColor).isEmpty()) {
             return(true);
         }
         else {
