@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -12,9 +13,13 @@ public class ChessGame {
     private ChessBoard board;
     private TeamColor color;
     public ChessGame() {
-
         this.board = new ChessBoard();
         this.color = TeamColor.WHITE;
+    }
+
+    public ChessGame(ChessGame original) {
+        this.board = new ChessBoard(original.getBoard());
+        this.color = original.color;
     }
 
     /**
@@ -48,9 +53,34 @@ public class ChessGame {
      * @return Set of valid moves for requested piece, or null if no piece at
      * startPosition
      */
-    // Runs piece moves on position it passes in, Don't check for team Color
+    // Runs piece moves on position it passes in, Don't check for team Color.
+    // Take care of the case that the given space is null.
+    public Collection<ChessMove> allValidMoves() {
+        Collection<ChessMove> allMoves = new ArrayList<>();
+        for (int i = 1; i <= 8; i += 1) {
+            //Col
+            for (int j = 1; j <= 8; j += 1) {
+                if (this.board.getPiece(new ChessPosition(i, j)) != null) {
+                    allMoves.addAll(this.validMoves(new ChessPosition(i, j)));
+                }
+            }
+        }
+        return(allMoves);
+
+    }
+
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> moves = this.board.getPiece(startPosition).pieceMoves(this.board, startPosition);
+        Collection<ChessMove> legalMoves = new ArrayList<>();
+        //validMoves should then call is in check and check mate.
+        for (ChessMove move : moves) {
+            ChessGame tempGame = new ChessGame(this);
+            tempGame.movePiece(new ChessMove(startPosition, move.getEndPosition(), move.getPromotionPiece()), tempGame.getBoard());
+            if (!tempGame.isInCheck(this.color)) {
+                legalMoves.add(move);
+            }
+        }
+        return(legalMoves);
     }
 
     /**
@@ -61,7 +91,9 @@ public class ChessGame {
      */
     // Here is when you care about color. Make move calls valid Moves
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        movePiece(move, this.board);
+        if (this.validMoves(move.getStartPosition()).contains(move)) {
+            movePiece(move, this.board);
+        }
     }
 
     public void movePiece(ChessMove move, ChessBoard board) {
@@ -136,7 +168,12 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (this.allValidMoves().isEmpty()) {
+            return(true);
+        }
+        else {
+            return(false);
+        }
     }
 
     /**

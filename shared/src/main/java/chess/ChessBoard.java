@@ -13,6 +13,19 @@ public class ChessBoard {
     public ChessBoard() {
     }
 
+    public ChessBoard(ChessBoard original) {
+        this.squares = new ChessPiece[8][8];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece originalPiece = original.squares[i][j];
+                if (originalPiece != null) {
+                    // Assuming ChessPiece has a copy constructor or implements Cloneable
+                    this.squares[i][j] = new ChessPiece(originalPiece);
+                }
+            }
+        }
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
@@ -82,8 +95,6 @@ public class ChessBoard {
 
         this.squares[7][3] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
         this.squares[7][4] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
-
-
     }
 
     @Override

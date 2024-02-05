@@ -10,12 +10,17 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessPiece {
+public class ChessPiece implements Cloneable{
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+    }
+
+    public ChessPiece(ChessPiece original) {
+        this.pieceColor = original.getTeamColor();
+        this.type = original.getPieceType();
     }
 
     /**
@@ -98,6 +103,12 @@ public class ChessPiece {
                 "pieceColor=" + pieceColor +
                 ", type=" + type +
                 '}';
+    }
+    // Override clone() to create a shallow copy
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return new ChessPiece(this.pieceColor, this.getPieceType());
+        //super.clone();
     }
 }
 
