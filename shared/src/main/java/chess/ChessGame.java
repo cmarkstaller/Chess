@@ -70,7 +70,7 @@ public class ChessGame {
         return(allMoves);
 
     }
-// Merica wrote all of my code
+
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Collection<ChessMove> moves = this.board.getPiece(startPosition).pieceMoves(this.board, startPosition);
         Collection<ChessMove> legalMoves = new ArrayList<>();
