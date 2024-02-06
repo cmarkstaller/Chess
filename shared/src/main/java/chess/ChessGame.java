@@ -96,6 +96,15 @@ public class ChessGame {
         if (this.validMoves(move.getStartPosition()).contains(move)) {
             movePiece(move, this.board);
         }
+        else {
+            throw new InvalidMoveException();
+        }
+        if (this.color == TeamColor.WHITE) {
+            this.color = TeamColor.BLACK;
+        }
+        else {
+            this.color = TeamColor.WHITE;
+        }
     }
 
     public void movePiece(ChessMove move, ChessBoard board) {
