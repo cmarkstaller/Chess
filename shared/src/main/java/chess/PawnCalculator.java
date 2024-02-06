@@ -26,7 +26,7 @@ public class PawnCalculator extends MasterPieceCalculator{
                     moves.add(new ChessMove(this.pos, new ChessPosition(row + 1, col), null));
                 }
             }
-            if (inBounds(this.row + 1, col)) {
+            if (inBounds(this.row + 1, col + 1) && inBounds(this.row + 1, col - 1)) {
                 if (capturePiece(this.row + 1, this.col + 1, this.board)) {
                     if (this.row == 7) {
                         moves.add(new ChessMove(this.pos, new ChessPosition(row + 1, col + 1), ChessPiece.PieceType.KNIGHT));
@@ -70,7 +70,7 @@ public class PawnCalculator extends MasterPieceCalculator{
                     moves.add(new ChessMove(this.pos, new ChessPosition(row - 1, col), null));
                 }
             }
-            if (inBounds(this.row - 1, col)) {
+            if (inBounds(this.row + 1, col + 1) && inBounds(this.row + 1, col - 1)) {
                 if (capturePiece(this.row - 1, this.col + 1, this.board)) {
                     if (this.row == 2) {
                         moves.add(new ChessMove(this.pos, new ChessPosition(row - 1, col + 1), ChessPiece.PieceType.KNIGHT));
