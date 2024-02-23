@@ -5,6 +5,8 @@ import dataAccess.DataAccessException;
 import dataAccess.GameDao;
 import dataAccess.UserDao;
 
+import java.io.IOException;
+
 public class ClearService {
     private final GameDao game;
     private final UserDao user;

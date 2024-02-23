@@ -5,6 +5,7 @@ import dataAccess.*;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import service.ClearService;
 
@@ -23,5 +24,7 @@ public class ClearServiceTest {
 
         ClearService testClear = new ClearService(testAuthDao, testGameDao, testUserDao);
         testClear.clear();
+        int daosizes = testAuthDao.size() + testGameDao.size() + testUserDao.size();
+        Assertions.assertEquals(0, daosizes);
     }
 }

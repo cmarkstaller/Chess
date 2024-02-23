@@ -23,4 +23,8 @@ public class MemoryAuthDao implements AuthDao {
         if (hashMap.isEmpty()) throw new DataAccessException("hashMap has no entries to clear");
         hashMap.clear();
     }
+
+    public int size() {
+        return(hashMap.size());
+    }
 }

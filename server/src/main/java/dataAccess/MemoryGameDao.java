@@ -31,4 +31,8 @@ public class MemoryGameDao implements GameDao {
         if (hashMap.isEmpty()) throw new DataAccessException("No games in hashMap");
         hashMap.clear();
     }
+
+    public int size() {
+        return(hashMap.size());
+    }
 }
