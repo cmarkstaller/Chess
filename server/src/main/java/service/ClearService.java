@@ -1,11 +1,9 @@
 package service;
 
 import dataAccess.AuthDao;
-import dataAccess.DataAccessException;
+import dataAccess.Exceptions.DataAccessException;
 import dataAccess.GameDao;
 import dataAccess.UserDao;
-
-import java.io.IOException;
 
 public class ClearService {
     private final GameDao game;

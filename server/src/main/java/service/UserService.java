@@ -1,8 +1,9 @@
 package service;
 
 import dataAccess.AuthDao;
-import dataAccess.DataAccessException;
-import dataAccess.IncorrectPasswordException;
+import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.IncorrectPasswordException;
+import dataAccess.Exceptions.NotLoggedInException;
 import dataAccess.UserDao;
 import model.AuthData;
 import model.UserData;
@@ -32,6 +33,10 @@ public class UserService {
         AuthData authentication = authDataGenerator(userName);
         auth.insertAuth(authentication);
         return(authentication);
+    }
+
+    public void logout(String authToken) throws NotLoggedInException {
+        auth.deleteAuth(authToken);
     }
 
     private AuthData authDataGenerator(String userName) {

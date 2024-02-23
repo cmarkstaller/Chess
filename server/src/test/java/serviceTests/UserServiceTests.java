@@ -1,6 +1,8 @@
 package serviceTests;
 
 import dataAccess.*;
+import dataAccess.Exceptions.*;
+import dataAccess.Exceptions.DataAccessException;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
@@ -12,7 +14,7 @@ public class UserServiceTests {
 // User Tests
 // Positive Registration test
     @Test
-    void positiveRegister() throws DataAccessException {
+    void positiveRegister() throws dataAccess.Exceptions.DataAccessException, NotLoggedInException {
         AuthDao testAuthDao = new MemoryAuthDao();
         UserDao testUserDao = new MemoryUserDao();
 
@@ -32,7 +34,7 @@ public class UserServiceTests {
 
 // Negative Registration test
     @Test
-    void negativeRegister() throws DataAccessException {
+    void negativeRegister() throws dataAccess.Exceptions.DataAccessException {
         AuthDao testAuthDao = new MemoryAuthDao();
         UserDao testUserDao = new MemoryUserDao();
 
@@ -46,7 +48,7 @@ public class UserServiceTests {
 
 // Positive Login test
     @Test
-    void positiveLogin() throws DataAccessException, IncorrectPasswordException {
+    void positiveLogin() throws dataAccess.Exceptions.DataAccessException, IncorrectPasswordException, NotLoggedInException {
         AuthDao testAuthDao = new MemoryAuthDao();
         UserDao testUserDao = new MemoryUserDao();
 
@@ -57,5 +59,42 @@ public class UserServiceTests {
         AuthData actual = testAuthDao.getAuth(expected.authToken());
 
         Assertions.assertEquals(expected, actual);
+    }
+
+// negative Login Test
+    @Test
+    void negativeLogin() throws DataAccessException {
+        AuthDao testAuthDao = new MemoryAuthDao();
+        UserDao testUserDao = new MemoryUserDao();
+
+        testUserDao.insertUser(new UserData("MyUsername", "MyPassword", "MyEmail"));
+
+        UserService userService = new UserService(testAuthDao, testUserDao);
+
+        Assertions.assertThrows(IncorrectPasswordException.class, () -> userService.login("MyUsername", "NotMyPassword"));
+    }
+
+// Positive Logout Test
+    @Test
+    void positiveLogout() throws DataAccessException, NotLoggedInException {
+        AuthDao testAuthDao = new MemoryAuthDao();
+        UserDao testUserDao = new MemoryUserDao();
+
+        UserService userService = new UserService(testAuthDao, testUserDao);
+        AuthData sessionAuth = userService.register("MyUsername", "MyPassword", "MyEmail");
+
+        userService.logout(sessionAuth.authToken());
+        Assertions.assertEquals(0, testAuthDao.size());
+    }
+
+// Negative Logout Test
+    @Test
+    void negativeLogout() {
+        AuthDao testAuthDao = new MemoryAuthDao();
+        UserDao testUserDao = new MemoryUserDao();
+
+        UserService userService = new UserService(testAuthDao, testUserDao);
+
+        Assertions.assertThrows(NotLoggedInException.class, () -> userService.logout("illegalAuthToken"));
     }
 }
