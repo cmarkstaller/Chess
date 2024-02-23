@@ -48,5 +48,31 @@ public class GameServiceTests {
 
         Assertions.assertThrows(NotLoggedInException.class, () -> gameService.listGames("randomAuth"));
     }
+// positive Create Game test
+    @Test
+    void positiveCreateGame() throws DataAccessException, NotLoggedInException{
+        AuthDao testAuthDao = new MemoryAuthDao();
+        GameDao testGameDao = new MemoryGameDao();
 
+        GameService gameService = new GameService(testAuthDao, testGameDao);
+        testAuthDao.insertAuth(new AuthData("MyAuthToken", "MyUsername"));
+
+        int gameID = gameService.createGame("MyAuthToken", "MyGameName");
+
+        String actual = testGameDao.getGame(gameID).gameName();
+        String expected = "MyGameName";
+
+        Assertions.assertEquals(actual, expected);
+    }
+
+// Negative Create Game Test
+    @Test
+    void negativeCreateGame() {
+        AuthDao testAuthDao = new MemoryAuthDao();
+        GameDao testGameDao = new MemoryGameDao();
+
+        GameService gameService = new GameService(testAuthDao, testGameDao);
+
+        Assertions.assertThrows(NotLoggedInException.class, () -> gameService.createGame("randomAuth", "My Game Name"));
+    }
 }
