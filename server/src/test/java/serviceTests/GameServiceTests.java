@@ -25,7 +25,6 @@ public class GameServiceTests {
 
         GameService gameService = new GameService(testAuthDao, testGameDao);
 
-
         ChessGame game1 = new ChessGame();
 
         testGameDao.insertGame(new GameData(1234567890, "WhiteUser", "BlackUser", "AwesomeGame", game1));
@@ -37,6 +36,17 @@ public class GameServiceTests {
         expected.add(new GameData(1234567890, "WhiteUser", "BlackUser", "AwesomeGame", game1));
 
         Assertions.assertEquals(actual, expected);
+    }
+
+// negative list games test
+    @Test
+    void negativeListGames() throws DataAccessException {
+        AuthDao testAuthDao = new MemoryAuthDao();
+        GameDao testGameDao = new MemoryGameDao();
+
+        GameService gameService = new GameService(testAuthDao, testGameDao);
+
+        Assertions.assertThrows(NotLoggedInException.class, () -> gameService.listGames("randomAuth"));
     }
 
 }
