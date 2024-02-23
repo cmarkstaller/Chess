@@ -6,6 +6,11 @@ import model.GameData;
 import java.util.*;
 
 public class MemoryGameDao implements GameDao {
+    private int index = 0;
+    public int indexID() {
+        ++index;
+        return(index);
+    }
     public HashMap<Integer, GameData> hashMap = new HashMap<>();
     public void insertGame(GameData game) throws dataAccess.Exceptions.DataAccessException {
         if (hashMap.containsKey(game.gameID())) throw new dataAccess.Exceptions.DataAccessException("Game already exists in hashmap");
