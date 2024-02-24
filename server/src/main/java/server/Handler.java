@@ -10,6 +10,7 @@ import model.LoginRequest;
 import model.ResponseMessage;
 import model.UserData;
 import service.ClearService;
+import service.GameService;
 import service.UserService;
 import spark.Request;
 import spark.Response;
@@ -30,7 +31,7 @@ public class Handler {
             res.status(500);
             return gson.toJson(new ResponseMessage(e.getMessage()));
         }
-        return("");
+        return("{}");
     }
 
     public Object register(Request req, Response res) {
@@ -85,7 +86,6 @@ public class Handler {
         try {
             userService.logout(authToken);
             res.status(200);
-            return("");
         }
         catch (NotLoggedInException e) {
             res.status(401);
@@ -95,8 +95,12 @@ public class Handler {
             res.status(500);
             return gson.toJson(new ResponseMessage(e.getMessage()));
         }
+        return("{}");
     } 
-    public Object listGames(Request req, Response res) {return "";}
+    public Object listGames(Request req, Response res) {
+        //GameService gameService = new GameService(auth, game);
+        return("");
+    }
     public Object createGame(Request req, Response res) {return "";}
     public Object joinGame(Request req, Response res) {return "";}
 }

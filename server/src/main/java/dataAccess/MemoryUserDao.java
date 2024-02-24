@@ -22,7 +22,6 @@ public class MemoryUserDao implements UserDao {
         hashMap.remove(userName);
     }
     public void clear() throws dataAccess.Exceptions.DataAccessException {
-        if (hashMap.isEmpty()) throw new DataAccessException("Error: No GameData to clear");
         hashMap.clear();
     }
 
