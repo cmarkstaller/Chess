@@ -3,6 +3,7 @@ package service;
 import dataAccess.AuthDao;
 import dataAccess.Exceptions.DataAccessException;
 import dataAccess.Exceptions.IncorrectPasswordException;
+import dataAccess.Exceptions.MissingInformationException;
 import dataAccess.Exceptions.NotLoggedInException;
 import dataAccess.UserDao;
 import model.AuthData;
@@ -21,6 +22,7 @@ public class UserService {
     }
 
     public AuthData register(String userName, String password, String email) throws DataAccessException {
+        if (userName == null || password == null || email == null) throw new MissingInformationException("Error: bad request");
         user.insertUser(new UserData(userName, password, email));
         AuthData authentication = authDataGenerator(userName);
         auth.insertAuth(authentication);
@@ -29,7 +31,7 @@ public class UserService {
 
     public AuthData login(String userName, String password) throws DataAccessException, IncorrectPasswordException {
         UserData userObject = user.getUser(userName);
-        if (!Objects.equals(userObject.password(), password)) throw new IncorrectPasswordException("");
+        if (!Objects.equals(userObject.password(), password)) throw new IncorrectPasswordException("bad password");
         AuthData authentication = authDataGenerator(userName);
         auth.insertAuth(authentication);
         return(authentication);

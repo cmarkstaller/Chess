@@ -15,6 +15,12 @@ public class Server {
         Handler handler = new Handler();
 
         Spark.delete("/db", handler::clearApplication);
+        Spark.post("/user", handler::register);
+        Spark.post("/session", handler::login);
+        Spark.delete("/session", handler::logout);
+        Spark.get("/game", handler::listGames);
+        Spark.post("/game", handler::createGame);
+        Spark.put("/game", handler::joinGame);
 
         Spark.awaitInitialization();
 

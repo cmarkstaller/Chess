@@ -14,11 +14,11 @@ public class MemoryAuthDao implements AuthDao {
         hashMap.put(authObject.authToken(), authObject);
     }
     public AuthData getAuth(String authToken) throws NotLoggedInException {
-        if (!hashMap.containsKey(authToken)) throw new NotLoggedInException("");
+        if (!hashMap.containsKey(authToken)) throw new NotLoggedInException("ur not logged in");
         return(hashMap.get(authToken));
     }
     public void deleteAuth(String authToken) throws NotLoggedInException {
-        if (!hashMap.containsKey(authToken)) throw new NotLoggedInException("");
+        if (!hashMap.containsKey(authToken)) throw new NotLoggedInException("Still not logged in");
         hashMap.remove(authToken);
     }
     public void clear() throws dataAccess.Exceptions.DataAccessException {
