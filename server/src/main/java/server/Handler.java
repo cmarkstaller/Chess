@@ -5,15 +5,15 @@ import dataAccess.Exceptions.IncorrectPasswordException;
 import dataAccess.Exceptions.MissingInformationException;
 import dataAccess.Exceptions.NotLoggedInException;
 import dataAccess.Exceptions.UserExistsException;
-import model.AuthData;
-import model.LoginRequest;
-import model.ResponseMessage;
-import model.UserData;
+import model.*;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
 import spark.Request;
 import spark.Response;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class Handler {
     private final AuthDao auth = new MemoryAuthDao();
@@ -98,9 +98,39 @@ public class Handler {
         return("{}");
     } 
     public Object listGames(Request req, Response res) {
-        //GameService gameService = new GameService(auth, game);
-        return("");
+        GameService gameService = new GameService(auth, game);
+        Gson gson = new Gson();
+        String authToken = req.headers("Authorization");
+
+        try {
+            Collection<GameData> gameList = gameService.listGames(authToken);
+            res.status(200);
+            return(gson.toJson(convertGameData(gameList)));
+        }
+
+        catch (NotLoggedInException e) {
+            res.status(401);
+            return gson.toJson(new ResponseMessage(e.getMessage()));
+        }
+
+        catch (dataAccess.Exceptions.DataAccessException e) {
+            res.status(500);
+            return gson.toJson(new ResponseMessage(e.getMessage()));
+        }
     }
+
+    private Collection<ListGamesResponse> convertGameData (Collection<GameData> gameList) {
+        ArrayList<ListGamesResponse> newList = new ArrayList<>();
+        for (GameData gameData : gameList) {
+            int gameID = gameData.gameID();
+            String whiteUsername = gameData.whiteUsername();
+            String blackUsername = gameData.blackUsername();
+            String gameName = gameData.gameName();
+            newList.add(new ListGamesResponse(gameID, whiteUsername, blackUsername, gameName));
+        }
+        return(newList);
+    }
+
     public Object createGame(Request req, Response res) {return "";}
     public Object joinGame(Request req, Response res) {return "";}
 }

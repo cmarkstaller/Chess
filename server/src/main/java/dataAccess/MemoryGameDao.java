@@ -30,7 +30,6 @@ public class MemoryGameDao implements GameDao {
         hashMap.replace(gameID, game);
     }
     public Collection<GameData> listGames() throws dataAccess.Exceptions.DataAccessException {
-        if (hashMap.isEmpty()) throw new dataAccess.Exceptions.DataAccessException("No games in hashMap");
         return(new ArrayList<>(hashMap.values()));
     }
 
