@@ -2,8 +2,7 @@ package serviceTests;
 
 import chess.ChessGame;
 import dataAccess.AuthDao;
-import dataAccess.Exceptions.DataAccessException;
-import dataAccess.Exceptions.NotLoggedInException;
+import dataAccess.Exceptions.*;
 import dataAccess.GameDao;
 import dataAccess.MemoryAuthDao;
 import dataAccess.MemoryGameDao;
@@ -50,7 +49,7 @@ public class GameServiceTests {
     }
 // positive Create Game test
     @Test
-    void positiveCreateGame() throws DataAccessException, NotLoggedInException{
+    void positiveCreateGame() throws DataAccessException, NotLoggedInException, GameDoesntExistException{
         AuthDao testAuthDao = new MemoryAuthDao();
         GameDao testGameDao = new MemoryGameDao();
 
@@ -74,5 +73,38 @@ public class GameServiceTests {
         GameService gameService = new GameService(testAuthDao, testGameDao);
 
         Assertions.assertThrows(NotLoggedInException.class, () -> gameService.createGame("randomAuth", "My Game Name"));
+    }
+
+// Positive Join Game Test
+   @Test
+   void positiveJoinGame() throws DataAccessException, NotLoggedInException, GameDoesntExistException, ColorAlreadyTakenException {
+       AuthDao testAuthDao = new MemoryAuthDao();
+       GameDao testGameDao = new MemoryGameDao();
+
+       testAuthDao.insertAuth(new AuthData("MyAuthToken", "MyUsername"));
+       testGameDao.insertGame(new GameData(1234, "whitey", null, "superGAme", new ChessGame()));
+
+       GameService gameService = new GameService(testAuthDao, testGameDao);
+
+       gameService.joinGame("MyAuthToken", 1234, ChessGame.TeamColor.BLACK);
+
+       String actual = testGameDao.getGame(1234).blackUsername();
+       String expected = "MyUsername";
+
+       Assertions.assertEquals(actual, expected);
+   }
+
+// negative join game test
+    @Test
+    void negativeJoinTest() throws DataAccessException, NotLoggedInException, GameDoesntExistException {
+        AuthDao testAuthDao = new MemoryAuthDao();
+        GameDao testGameDao = new MemoryGameDao();
+
+        testAuthDao.insertAuth(new AuthData("MyAuthToken", "MyUsername"));
+        testGameDao.insertGame(new GameData(1234, "whitey", "yeet", "superGame", new ChessGame()));
+
+        GameService gameService = new GameService(testAuthDao, testGameDao);
+
+        Assertions.assertThrows(ColorAlreadyTakenException.class, () -> gameService.joinGame("MyAuthToken", 1234, ChessGame.TeamColor.BLACK));
     }
 }
