@@ -35,7 +35,7 @@ public class MemoryGameDao implements GameDao {
     }
 
     public void clear() throws dataAccess.Exceptions.DataAccessException {
-        if (hashMap.isEmpty()) throw new DataAccessException("No games in hashMap");
+        if (hashMap.isEmpty()) throw new DataAccessException("Error: No GameData to clear");
         hashMap.clear();
     }
 

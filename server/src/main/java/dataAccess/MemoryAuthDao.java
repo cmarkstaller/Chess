@@ -22,7 +22,7 @@ public class MemoryAuthDao implements AuthDao {
         hashMap.remove(authToken);
     }
     public void clear() throws dataAccess.Exceptions.DataAccessException {
-        if (hashMap.isEmpty()) throw new DataAccessException("hashMap has no entries to clear");
+        if (hashMap.isEmpty()) throw new DataAccessException("Error: No AuthData to clear");
         hashMap.clear();
     }
 
