@@ -1,10 +1,7 @@
 package server;
 import com.google.gson.Gson;
 import dataAccess.*;
-import dataAccess.Exceptions.IncorrectPasswordException;
-import dataAccess.Exceptions.MissingInformationException;
-import dataAccess.Exceptions.NotLoggedInException;
-import dataAccess.Exceptions.UserExistsException;
+import dataAccess.Exceptions.*;
 import model.*;
 import service.ClearService;
 import service.GameService;
@@ -69,7 +66,7 @@ public class Handler {
             res.status(200);
             return(gson.toJson(authData));
         }
-        catch (dataAccess.Exceptions.IncorrectPasswordException e) {
+        catch (IncorrectPasswordException | UserNotFoundException e) {
             res.status(401);
             return gson.toJson(new ResponseMessage(e.getMessage()));
         }
@@ -105,7 +102,7 @@ public class Handler {
         try {
             Collection<GameData> gameList = gameService.listGames(authToken);
             res.status(200);
-            return(gson.toJson(convertGameData(gameList)));
+            return(gson.toJson(new GameListResponseMessage(convertGameData(gameList))));
         }
 
         catch (NotLoggedInException e) {
@@ -131,6 +128,57 @@ public class Handler {
         return(newList);
     }
 
-    public Object createGame(Request req, Response res) {return "";}
-    public Object joinGame(Request req, Response res) {return "";}
+    public Object createGame(Request req, Response res) {
+        GameService gameService = new GameService(auth, game);
+        Gson gson = new Gson();
+        String authToken = req.headers("Authorization");
+        CreateGameRequest createGameRequest = gson.fromJson(req.body(), CreateGameRequest.class);
+
+        try {
+            int gameID = gameService.createGame(authToken, createGameRequest.gameName());
+            res.status(200);
+            return gson.toJson(new CreateGameResponse(gameID));
+        }
+        catch (MissingInformationException e) {
+            res.status(400);
+            return gson.toJson(new ResponseMessage(e.getMessage()));
+        }
+        catch (NotLoggedInException e) {
+            res.status(401);
+            return gson.toJson(new ResponseMessage(e.getMessage()));
+        }
+        catch (dataAccess.Exceptions.DataAccessException e) {
+            res.status(500);
+            return gson.toJson(new ResponseMessage(e.getMessage()));
+        }
+
+    }
+    public Object joinGame(Request req, Response res) {
+        GameService gameService = new GameService(auth, game);
+        Gson gson = new Gson();
+        String authToken = req.headers("Authorization");
+        JoinGameRequest joinGameRequest = gson.fromJson(req.body(), JoinGameRequest.class);
+
+        try {
+            gameService.joinGame(authToken, joinGameRequest.gameID(), joinGameRequest.playerColor());
+            res.status(200);
+            return("{}");
+        }
+        catch (GameDoesntExistException e) {
+            res.status(400);
+            return gson.toJson(new ResponseMessage(e.getMessage()));
+        }
+        catch (NotLoggedInException e) {
+            res.status(401);
+            return gson.toJson(new ResponseMessage(e.getMessage()));
+        }
+        catch (ColorAlreadyTakenException e) {
+            res.status(403);
+            return gson.toJson(new ResponseMessage(e.getMessage()));
+        }
+        catch (dataAccess.Exceptions.DataAccessException e) {
+            res.status(500);
+            return gson.toJson(new ResponseMessage(e.getMessage()));
+        }
+    }
 }

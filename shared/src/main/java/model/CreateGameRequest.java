@@ -1,2 +1,4 @@
-package model;public class CreateGameRequest {
+package model;
+
+public record CreateGameRequest (String gameName){
 }

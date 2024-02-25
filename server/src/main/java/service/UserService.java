@@ -29,9 +29,9 @@ public class UserService {
         return(authentication);
     }
 
-    public AuthData login(String userName, String password) throws DataAccessException, IncorrectPasswordException {
+    public AuthData login(String userName, String password) throws DataAccessException {
         UserData userObject = user.getUser(userName);
-        if (!Objects.equals(userObject.password(), password)) throw new IncorrectPasswordException("bad password");
+        if (!Objects.equals(userObject.password(), password)) throw new IncorrectPasswordException("bad password error");
         AuthData authentication = authDataGenerator(userName);
         auth.insertAuth(authentication);
         return(authentication);

@@ -1,2 +1,4 @@
-package model;public class CreateGameResponse {
+package model;
+
+public record CreateGameResponse (int gameID) {
 }
