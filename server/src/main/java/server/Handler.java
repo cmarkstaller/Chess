@@ -49,7 +49,6 @@ public class Handler {
             res.status(403);
             return gson.toJson(new ResponseMessage(e.getMessage()));
         }
-
         catch (dataAccess.Exceptions.DataAccessException e){
             res.status(500);
             return gson.toJson(new ResponseMessage(e.getMessage()));
@@ -104,28 +103,14 @@ public class Handler {
             res.status(200);
             return(gson.toJson(new GameListResponseMessage(convertGameData(gameList))));
         }
-
         catch (NotLoggedInException e) {
             res.status(401);
             return gson.toJson(new ResponseMessage(e.getMessage()));
         }
-
         catch (dataAccess.Exceptions.DataAccessException e) {
             res.status(500);
             return gson.toJson(new ResponseMessage(e.getMessage()));
         }
-    }
-
-    private Collection<ListGamesResponse> convertGameData (Collection<GameData> gameList) {
-        ArrayList<ListGamesResponse> newList = new ArrayList<>();
-        for (GameData gameData : gameList) {
-            int gameID = gameData.gameID();
-            String whiteUsername = gameData.whiteUsername();
-            String blackUsername = gameData.blackUsername();
-            String gameName = gameData.gameName();
-            newList.add(new ListGamesResponse(gameID, whiteUsername, blackUsername, gameName));
-        }
-        return(newList);
     }
 
     public Object createGame(Request req, Response res) {
@@ -151,7 +136,6 @@ public class Handler {
             res.status(500);
             return gson.toJson(new ResponseMessage(e.getMessage()));
         }
-
     }
     public Object joinGame(Request req, Response res) {
         GameService gameService = new GameService(auth, game);
@@ -180,5 +164,18 @@ public class Handler {
             res.status(500);
             return gson.toJson(new ResponseMessage(e.getMessage()));
         }
+    }
+
+    // Helper function for outputting the gamesList the way it wants it
+    private Collection<ListGamesResponse> convertGameData (Collection<GameData> gameList) {
+        ArrayList<ListGamesResponse> newList = new ArrayList<>();
+        for (GameData gameData : gameList) {
+            int gameID = gameData.gameID();
+            String whiteUsername = gameData.whiteUsername();
+            String blackUsername = gameData.blackUsername();
+            String gameName = gameData.gameName();
+            newList.add(new ListGamesResponse(gameID, whiteUsername, blackUsername, gameName));
+        }
+        return(newList);
     }
 }

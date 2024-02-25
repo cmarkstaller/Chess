@@ -14,7 +14,7 @@ public class MemoryAuthDao implements AuthDao {
         hashMap.put(authObject.authToken(), authObject);
     }
     public AuthData getAuth(String authToken) throws NotLoggedInException {
-        if (!hashMap.containsKey(authToken)) throw new NotLoggedInException("ur not logged in error");
+        if (!hashMap.containsKey(authToken)) throw new NotLoggedInException("you are not logged in error");
         return(hashMap.get(authToken));
     }
     public void deleteAuth(String authToken) throws NotLoggedInException {

@@ -18,12 +18,12 @@ public class GameService {
         this.game = game;
     }
 
-    public Collection<GameData> listGames(String authToken) throws DataAccessException, NotLoggedInException {
+    public Collection<GameData> listGames(String authToken) throws DataAccessException {
         auth.getAuth(authToken);
         return(game.listGames());
     }
 
-    public int createGame(String authToken, String gameName) throws NotLoggedInException, DataAccessException {
+    public int createGame(String authToken, String gameName) throws DataAccessException {
         if (authToken == null || gameName == null) throw new MissingInformationException("Error: bad request");
         auth.getAuth(authToken);
         GameData newGame = new GameData(game.indexID(), null, null, gameName, new ChessGame());
