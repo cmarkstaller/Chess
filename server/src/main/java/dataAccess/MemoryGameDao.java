@@ -22,7 +22,8 @@ public class MemoryGameDao implements GameDao {
         return(hashMap.get(gameID));
     }
     public void updateGame(int gameID, GameData game) throws GameDoesntExistException {
-        if (!hashMap.containsKey(gameID)) throw new GameDoesntExistException("Game Doesn't exist error");
+        if (!hashMap.containsKey(gameID)) throw new GameDoesntExistException("Game Doesn't exist " +
+                "error");
         hashMap.replace(gameID, game);
     }
     public Collection<GameData> listGames() throws dataAccess.Exceptions.DataAccessException {
