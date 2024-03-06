@@ -1,44 +1,50 @@
 package dataAccess;
-import dataAccess.*;
+
 import dataAccess.Exceptions.DataAccessException;
-import dataAccess.Exceptions.NotLoggedInException;
-import model.AuthData;
+import dataAccess.Exceptions.GameDoesntExistException;
+import model.GameData;
 
 import java.sql.SQLException;
+import java.util.Collection;
 
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
+public class DBGameDao implements GameDao {
 
-public class DBAuthDao implements AuthDao {
-    @Override
-    public void insertAuth(AuthData authObject) throws DataAccessException {
+    public int indexID() {
+        return 0;
     }
-    @Override
-    public AuthData getAuth(String authToken) throws NotLoggedInException {
+
+    public void insertGame(GameData game) throws DataAccessException {
+
+    }
+
+    public GameData getGame(int gameID) throws GameDoesntExistException {
         return null;
     }
-    @Override
-    public void deleteAuth(String authToken) throws NotLoggedInException {
-    }
-    @Override
-    public void clear() throws DataAccessException {
-        configureDatabase();
-        var statement = "TRUNCATE AuthData";
-        executeUpdate(statement);
+
+    public void updateGame(int gameID, GameData game) throws GameDoesntExistException {
+
     }
 
-    @Override
+    public Collection<GameData> listGames() throws DataAccessException {
+        return null;
+    }
+
+    public void clear() throws DataAccessException {
+
+    }
+
     public int size() {
         return 0;
     }
 
     private final String[] createStatements = {
             """
-            CREATE TABLE IF NOT EXISTS  AuthData (
-              `authToken` varchar(256) NOT NULL,
-              `username` varchar(256) NOT NULL,
-              PRIMARY KEY (`authToken`),
-              INDEX(username)
+            CREATE TABLE IF NOT EXISTS GameData (
+              `gameID` int NOT NULL AUTO_INCREMENT,
+              `whiteUsername` varchar(256),
+              `blackUsername` varchar(256),
+              `gameName` varchar(256) NOT NULL,
+              `game` TEXT NOT NULL
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
