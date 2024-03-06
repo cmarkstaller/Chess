@@ -2,6 +2,7 @@ package server;
 import com.google.gson.Gson;
 import dataAccess.*;
 import dataAccess.Exceptions.*;
+import dataAccess.Exceptions.DataAccessException;
 import model.*;
 import service.ClearService;
 import service.GameService;
@@ -13,7 +14,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class Handler {
-    private final AuthDao auth = new MemoryAuthDao();
+    //private final AuthDao auth = new MemoryAuthDao();
+    private final AuthDao auth = new DBAuthDao();
     private final GameDao game = new MemoryGameDao();
     private final UserDao user = new MemoryUserDao();
 
