@@ -4,6 +4,7 @@ import dataAccess.Exceptions.DataAccessException;
 import dataAccess.Exceptions.NotLoggedInException;
 import model.AuthData;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
@@ -12,6 +13,8 @@ import static java.sql.Types.NULL;
 public class DBAuthDao implements AuthDao {
     @Override
     public void insertAuth(AuthData authObject) throws DataAccessException {
+        configureDatabase();
+
     }
     @Override
     public AuthData getAuth(String authToken) throws NotLoggedInException {
@@ -24,7 +27,12 @@ public class DBAuthDao implements AuthDao {
     public void clear() throws DataAccessException {
         configureDatabase();
         var statement = "TRUNCATE AuthData";
-        executeUpdate(statement);
+        try(PreparedStatement stmt = DatabaseManager.getConnection().prepareStatement(statement)) {
+            stmt.executeUpdate();
+        }
+        catch (SQLException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     @Override
@@ -42,7 +50,6 @@ public class DBAuthDao implements AuthDao {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
             """
     };
-
 
     private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
