@@ -27,8 +27,7 @@ public class GameService {
         if (authToken == null || gameName == null) throw new MissingInformationException("Error: bad request");
         auth.getAuth(authToken);
         GameData newGame = new GameData(game.indexID(), null, null, gameName, new ChessGame());
-        game.insertGame(newGame);
-        return(newGame.gameID());
+        return(game.insertGame(newGame));
     }
 
     public void joinGame(String authToken, int gameID, ChessGame.TeamColor color) throws DataAccessException {

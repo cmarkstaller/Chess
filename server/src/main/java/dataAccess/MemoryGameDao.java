@@ -13,9 +13,10 @@ public class MemoryGameDao implements GameDao {
         return(index);
     }
     public HashMap<Integer, GameData> hashMap = new HashMap<>();
-    public void insertGame(GameData game) throws dataAccess.Exceptions.DataAccessException {
+    public int insertGame(GameData game) throws dataAccess.Exceptions.DataAccessException {
         if (hashMap.containsKey(game.gameID())) throw new dataAccess.Exceptions.DataAccessException("Game already exists in hashmap");
         hashMap.put(game.gameID(), game);
+        return(game.gameID());
     }
     public GameData getGame(int gameID) throws GameDoesntExistException {
         if (!hashMap.containsKey(gameID)) throw new GameDoesntExistException("bad game ID error");

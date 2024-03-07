@@ -1,13 +1,11 @@
 package service;
 
 import dataAccess.AuthDao;
-import dataAccess.Exceptions.DataAccessException;
-import dataAccess.Exceptions.IncorrectPasswordException;
-import dataAccess.Exceptions.MissingInformationException;
-import dataAccess.Exceptions.NotLoggedInException;
+import dataAccess.Exceptions.*;
 import dataAccess.UserDao;
 import model.AuthData;
 import model.UserData;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -23,7 +21,10 @@ public class UserService {
 
     public AuthData register(String userName, String password, String email) throws DataAccessException {
         if (userName == null || password == null || email == null) throw new MissingInformationException("Error: bad request");
-        user.insertUser(new UserData(userName, password, email));
+
+        String hashedPassword = new BCryptPasswordEncoder().encode(password);
+
+        user.insertUser(new UserData(userName, hashedPassword, email));
         AuthData authentication = authDataGenerator(userName);
         auth.insertAuth(authentication);
         return(authentication);
@@ -31,7 +32,14 @@ public class UserService {
 
     public AuthData login(String userName, String password) throws DataAccessException {
         UserData userObject = user.getUser(userName);
-        if (!Objects.equals(userObject.password(), password)) throw new IncorrectPasswordException("bad password error");
+        if (userObject == null) {
+            throw new UserNotFoundException("User not found error");
+        }
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String hashedPassword = encoder.encode(password);
+
+        if (!encoder.matches(password, userObject.password())) throw new IncorrectPasswordException("bad password error");
         AuthData authentication = authDataGenerator(userName);
         auth.insertAuth(authentication);
         return(authentication);
