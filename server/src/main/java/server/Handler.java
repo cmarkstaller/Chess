@@ -16,7 +16,7 @@ import java.util.Collection;
 public class Handler {
     //private final AuthDao auth = new MemoryAuthDao();
     private final AuthDao auth = new DBAuthDao();
-    private final GameDao game = new MemoryGameDao();
+    private final GameDao game = new DBGameDao();
     private final UserDao user = new DBUserDao();
 
     public Object clearApplication(Request req, Response res) {
