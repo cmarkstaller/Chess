@@ -17,7 +17,7 @@ public class Handler {
     //private final AuthDao auth = new MemoryAuthDao();
     private final AuthDao auth = new DBAuthDao();
     private final GameDao game = new MemoryGameDao();
-    private final UserDao user = new MemoryUserDao();
+    private final UserDao user = new DBUserDao();
 
     public Object clearApplication(Request req, Response res) {
         ClearService clearService = new ClearService(auth, game, user);
