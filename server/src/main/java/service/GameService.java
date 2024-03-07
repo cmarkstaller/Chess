@@ -31,7 +31,7 @@ public class GameService {
         return(newGame.gameID());
     }
 
-    public void joinGame(String authToken, int gameID, ChessGame.TeamColor color) throws NotLoggedInException, GameDoesntExistException, ColorAlreadyTakenException {
+    public void joinGame(String authToken, int gameID, ChessGame.TeamColor color) throws DataAccessException {
         String userName = auth.getAuth(authToken).username();
         GameData myGame = game.getGame(gameID);
         if (color != null) {

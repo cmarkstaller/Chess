@@ -1,4 +1,5 @@
 package dataAccess;
+import com.google.gson.Gson;
 import dataAccess.*;
 import dataAccess.Exceptions.DataAccessException;
 import dataAccess.Exceptions.NotLoggedInException;
@@ -11,33 +12,66 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
 public class DBAuthDao implements AuthDao {
-    @Override
+
     public void insertAuth(AuthData authObject) throws DataAccessException {
         configureDatabase();
-
+        var statement = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
+        executeUpdate(statement, authObject.authToken(), authObject.username());
     }
-    @Override
-    public AuthData getAuth(String authToken) throws NotLoggedInException {
+
+    public AuthData getAuth(String authToken) throws DataAccessException {
+        configureDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT username FROM AuthData WHERE authToken=?";
+            var ps = conn.prepareStatement(statement);
+            ps.setString(1, authToken);
+            var rs = ps.executeQuery();
+            if (rs.next()) {
+                String username = rs.getString("username");
+                return new AuthData(authToken, username);
+            }
+        } catch (Exception e) {
+            throw new DataAccessException(String.format("Unable to read data: %s", e.getMessage()));
+        }
         return null;
     }
-    @Override
-    public void deleteAuth(String authToken) throws NotLoggedInException {
+
+    public void deleteAuth(String authToken) throws DataAccessException {
+        configureDatabase();
+        var statement = "DELETE FROM AuthData WHERE authToken=?";
+        executeUpdate(statement, authToken);
     }
-    @Override
+
     public void clear() throws DataAccessException {
         configureDatabase();
         var statement = "TRUNCATE AuthData";
-        try(PreparedStatement stmt = DatabaseManager.getConnection().prepareStatement(statement)) {
-            stmt.executeUpdate();
-        }
-        catch (SQLException e) {
-            throw new DataAccessException(e.getMessage());
-        }
+        executeUpdate(statement);
     }
 
     @Override
     public int size() {
         return 0;
+    }
+
+    private int executeUpdate(String statement, Object... params) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
+                for (var i = 0; i < params.length; i++) {
+                    var param = params[i];
+                    if (param instanceof String p) ps.setString(i + 1, p);
+                }
+                ps.executeUpdate();
+
+                var rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+
+                return 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
+        }
     }
 
     private final String[] createStatements = {

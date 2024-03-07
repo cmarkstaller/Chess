@@ -24,7 +24,6 @@ public class MemoryAuthDao implements AuthDao {
     public void clear() throws dataAccess.Exceptions.DataAccessException {
         hashMap.clear();
     }
-
     public int size() {
         return(hashMap.size());
     }

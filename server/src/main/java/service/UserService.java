@@ -37,7 +37,7 @@ public class UserService {
         return(authentication);
     }
 
-    public void logout(String authToken) throws NotLoggedInException {
+    public void logout(String authToken) throws DataAccessException {
         auth.deleteAuth(authToken);
     }
 
