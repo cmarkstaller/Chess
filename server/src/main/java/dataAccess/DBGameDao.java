@@ -19,7 +19,9 @@ public class DBGameDao implements GameDao {
     }
 
     public void insertGame(GameData game) throws DataAccessException {
-
+        configureDatabase();
+        var statement = "INSERT INTO GameData (whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?)";
+        executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), new Gson().toJson(game.game()));
     }
 
     public GameData getGame(int gameID) throws GameDoesntExistException {
