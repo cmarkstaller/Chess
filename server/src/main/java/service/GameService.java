@@ -19,6 +19,9 @@ public class GameService {
     }
 
     public Collection<GameData> listGames(String authToken) throws DataAccessException {
+        if (auth.getAuth(authToken) == null) {
+            throw new NotLoggedInException("you are not logged in error");
+        }
         auth.getAuth(authToken);
         return(game.listGames());
     }
