@@ -48,6 +48,9 @@ public class DBGameDao implements GameDao {
     }
 
     public void updateGame(int gameID, GameData game) throws DataAccessException {
+        if (this.getGame(gameID) == null) {
+            throw new GameDoesntExistException("Game doesn't exist error");
+        }
         configureDatabase();
         var statement = "UPDATE GameData SET whiteUsername = ?, blackUsername = ?, chessGame = ? WHERE gameID = ?";
         executeUpdate(statement, game.whiteUsername(), game.blackUsername(), new Gson().toJson(game), gameID);
