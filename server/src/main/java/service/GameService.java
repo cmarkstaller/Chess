@@ -25,13 +25,24 @@ public class GameService {
 
     public int createGame(String authToken, String gameName) throws DataAccessException {
         if (authToken == null || gameName == null) throw new MissingInformationException("Error: bad request");
+
+        if (auth.getAuth(authToken) == null) {
+            throw new NotLoggedInException("you are not logged in error");
+        }
         auth.getAuth(authToken);
         GameData newGame = new GameData(game.indexID(), null, null, gameName, new ChessGame());
         return(game.insertGame(newGame));
     }
 
     public void joinGame(String authToken, int gameID, ChessGame.TeamColor color) throws DataAccessException {
+        if (auth.getAuth(authToken) == null) {
+            throw new NotLoggedInException("you are not logged in error");
+        }
         String userName = auth.getAuth(authToken).username();
+        if (game.getGame(gameID) == null) {
+            throw new GameDoesntExistException("bad game ID error");
+        }
+
         GameData myGame = game.getGame(gameID);
         if (color != null) {
             switch (color) {
