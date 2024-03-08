@@ -1,6 +1,7 @@
 package dataAccess;
 
 import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.UserExistsException;
 import model.AuthData;
 import model.UserData;
 
@@ -10,6 +11,9 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class DBUserDao implements UserDao {
     public void insertUser(UserData user) throws DataAccessException {
+        if (this.getUser(user.username()) != null) {
+            throw new UserExistsException("User already exists exception");
+        }
         configureDatabase();
         var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
         executeUpdate(statement, user.username(), user.password(), user.email());

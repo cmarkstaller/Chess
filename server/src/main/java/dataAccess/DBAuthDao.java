@@ -3,6 +3,7 @@ import com.google.gson.Gson;
 import dataAccess.*;
 import dataAccess.Exceptions.DataAccessException;
 import dataAccess.Exceptions.NotLoggedInException;
+import dataAccess.Exceptions.UserExistsException;
 import model.AuthData;
 
 import java.sql.PreparedStatement;
@@ -14,6 +15,9 @@ import static java.sql.Types.NULL;
 public class DBAuthDao implements AuthDao {
 
     public void insertAuth(AuthData authObject) throws DataAccessException {
+        if(this.getAuth(authObject.authToken()) != null) {
+            throw new UserExistsException("User already exists error");
+        }
         configureDatabase();
         var statement = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
         executeUpdate(statement, authObject.authToken(), authObject.username());
@@ -37,6 +41,9 @@ public class DBAuthDao implements AuthDao {
     }
 
     public void deleteAuth(String authToken) throws DataAccessException {
+        if (this.getAuth(authToken) == null) {
+            throw new NotLoggedInException("you aren't logged in mate");
+        }
         configureDatabase();
         var statement = "DELETE FROM AuthData WHERE authToken=?";
         executeUpdate(statement, authToken);
