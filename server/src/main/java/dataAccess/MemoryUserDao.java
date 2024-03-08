@@ -14,7 +14,8 @@ public class MemoryUserDao implements UserDao {
         hashMap.put(user.username(), user);
     }
     public UserData getUser(String userName) throws dataAccess.Exceptions.DataAccessException {
-        if (!hashMap.containsKey(userName)) throw new UserNotFoundException("User not found error");
+        if (!hashMap.containsKey(userName)) return null;
+        //if (!hashMap.containsKey(userName)) throw new UserNotFoundException("User not found error");
         return(hashMap.get(userName));
     }
     public void clear() throws dataAccess.Exceptions.DataAccessException {
