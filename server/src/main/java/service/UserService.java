@@ -22,6 +22,10 @@ public class UserService {
     public AuthData register(String userName, String password, String email) throws DataAccessException {
         if (userName == null || password == null || email == null) throw new MissingInformationException("Error: bad request");
 
+        if (user.getUser(userName) != null) {
+            throw new UserExistsException("User already exists error");
+        }
+
         String hashedPassword = new BCryptPasswordEncoder().encode(password);
 
         user.insertUser(new UserData(userName, hashedPassword, email));
@@ -37,7 +41,6 @@ public class UserService {
         }
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String hashedPassword = encoder.encode(password);
 
         if (!encoder.matches(password, userObject.password())) throw new IncorrectPasswordException("bad password error");
         AuthData authentication = authDataGenerator(userName);
@@ -46,6 +49,9 @@ public class UserService {
     }
 
     public void logout(String authToken) throws DataAccessException {
+        if (auth.getAuth(authToken) == null) {
+            throw new NotLoggedInException("you are not logged in error");
+        }
         auth.deleteAuth(authToken);
     }
 
