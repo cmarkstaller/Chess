@@ -80,4 +80,15 @@ public class ServerFacadeTests {
         Assertions.assertEquals("you are not logged in error", facade.logout());
     }
 
+    @Test
+    public void positiveCreateGame() throws Exception {
+        facade.register("myUsername", "myPassword", "myEmail");
+        Assertions.assertEquals("1", facade.createGame("maGame"));
+    }
+
+    @ Test
+    public void negativeCreateGame() throws Exception {
+        Assertions.assertEquals("you are not logged in error", facade.createGame("maGame"));
+    }
+
 }
