@@ -1,5 +1,7 @@
 package clientTests;
 
+import chess.ChessGame;
+import dataAccess.Exceptions.ClientExceptionWrapper;
 import model.ListGamesResponse;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -106,4 +108,25 @@ public class ServerFacadeTests {
         Assertions.assertEquals(expected, facade.listGames());
     }
 
+    @Test
+    public void negativeListGames() throws Exception {
+        Assertions.assertThrows(ClientExceptionWrapper.class, () -> facade.listGames());
+    }
+
+    @Test
+    public void positiveJoinGame() throws Exception {
+        facade.register("myUsername", "myPassword", "myEmail");
+        facade.createGame("maGame");
+        facade.joinGame(ChessGame.TeamColor.BLACK, 1);
+
+        ArrayList<ListGamesResponse> expected = new ArrayList<ListGamesResponse>();
+        expected.add(new ListGamesResponse(1, null, "myUsername", "maGame"));
+
+        Assertions.assertEquals(expected, facade.listGames());
+    }
+
+    @Test
+    public void negativeJoinGame() throws Exception {
+        Assertions.assertThrows(ClientExceptionWrapper.class, () -> facade.listGames());
+    }
 }
