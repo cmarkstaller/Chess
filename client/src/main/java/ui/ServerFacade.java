@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
 public class ServerFacade {
@@ -130,7 +132,6 @@ public class ServerFacade {
         }
     }
 
-    // Spark.post("/game", handler::createGame);
     public String createGame(String gameName) throws Exception {
         // Specify the desired endpoint
         URI uri = new URI("http://localhost:" + this.port + "/game");
@@ -145,7 +146,7 @@ public class ServerFacade {
         http.addRequestProperty("Authorization", authToken);
 
         // Write out the body
-        var body = new CreateGameRequest("gameName");
+        var body = new CreateGameRequest(gameName);
         try (var outputStream = http.getOutputStream()) {
             var jsonBody = new Gson().toJson(body);
             outputStream.write(jsonBody.getBytes());
@@ -168,6 +169,41 @@ public class ServerFacade {
                     ResponseMessage errorResponse = new Gson().fromJson(errorStreamReader, ResponseMessage.class);
 
                     return(errorResponse.message());
+                }
+        }
+    }
+
+    // Spark.get("/game", handler::listGames);
+    public Collection<ListGamesResponse> listGames() throws Exception {
+        // Specify the desired endpoint
+        URI uri = new URI("http://localhost:" + this.port + "/game");
+        HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
+        http.setRequestMethod("GET");
+
+        // Specify that we are going to write out data
+        http.setDoOutput(true);
+
+        // Write out a header
+        http.addRequestProperty("Content-Type", "application/json");
+        http.addRequestProperty("Authorization", authToken);
+
+        // Make the request
+        http.connect();
+
+        int responseCode = http.getResponseCode();
+        switch(responseCode) {
+            case 200:
+                try (InputStream respBody = http.getInputStream()) {
+                    InputStreamReader inputStreamReader = new InputStreamReader(respBody);
+                    Collection<ListGamesResponse> games = new Gson().fromJson(inputStreamReader, GameListResponseMessage.class).games();
+                    return (games);
+                }
+            default:
+                try (InputStream errorStream = http.getErrorStream()) {
+                    InputStreamReader errorStreamReader = new InputStreamReader(errorStream);
+                    ResponseMessage errorResponse = new Gson().fromJson(errorStreamReader, ResponseMessage.class);
+
+                    throw new RuntimeException(errorResponse.message());
                 }
         }
     }

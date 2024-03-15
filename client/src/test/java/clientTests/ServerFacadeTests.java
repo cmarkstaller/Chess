@@ -1,5 +1,6 @@
 package clientTests;
 
+import model.ListGamesResponse;
 import org.junit.jupiter.api.*;
 import server.Server;
 import ui.ServerFacade;
@@ -7,6 +8,7 @@ import ui.ServerFacade;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 
 
 public class ServerFacadeTests {
@@ -86,9 +88,22 @@ public class ServerFacadeTests {
         Assertions.assertEquals("1", facade.createGame("maGame"));
     }
 
-    @ Test
+    @Test
     public void negativeCreateGame() throws Exception {
         Assertions.assertEquals("you are not logged in error", facade.createGame("maGame"));
+    }
+
+    @Test
+    public void positiveListGames() throws Exception {
+        facade.register("myUsername", "myPassword", "myEmail");
+        facade.createGame("maGame");
+        facade.createGame("maOtherGame");
+
+        ArrayList<ListGamesResponse> expected = new ArrayList<ListGamesResponse>();
+        expected.add(new ListGamesResponse(1, null, null, "maGame"));
+        expected.add(new ListGamesResponse(2, null, null, "maOtherGame"));
+
+        Assertions.assertEquals(expected, facade.listGames());
     }
 
 }
