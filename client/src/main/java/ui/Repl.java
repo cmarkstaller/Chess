@@ -81,9 +81,11 @@ public class Repl {
 
             if (userInput[0].equals("help")) {
                 System.out.println("\nCommands\n" +
-                        ">>> register <username> <password> <email>\n" +
-                        ">>> login <username> <password>\n" +
-                        ">>> quit\n");
+                        ">>> create game <game name>\n" +
+                        ">>> join <black / white> <game ID>\n" +
+                        ">>> list games\n" +
+                        ">>> observe <game ID>\n" +
+                        ">>> logout\n");
             }
 
             else if (userInput[0].equals("create") && userInput[1].equals("game")) {
@@ -107,7 +109,7 @@ public class Repl {
                 try {
                     facade.joinGame(teamColor, Integer.parseInt(userInput[2]));
                     System.out.println("joining game");
-                    gamePlay();
+                    gamePlay(teamColor);
                 } catch (ClientExceptionWrapper e) {
                     System.out.println(e.getMessage());
                 } catch (ArrayIndexOutOfBoundsException e) {
@@ -123,6 +125,8 @@ public class Repl {
                 try {
                     facade.joinGame(null, Integer.parseInt(userInput[1]));
                     System.out.println("observing game");
+                    gamePlay(ChessGame.TeamColor.WHITE);
+
                 } catch (ClientExceptionWrapper e) {
                     System.out.println(e.getMessage());
                 } catch (ArrayIndexOutOfBoundsException e) {
@@ -162,11 +166,16 @@ public class Repl {
         }
     }
 
-    public void gamePlay() {
-        printBoard(new ChessBoard());
+    public void gamePlay(ChessGame.TeamColor color) {
+        if (color == ChessGame.TeamColor.WHITE) {
+            printBoardWhite(new ChessBoard());
+        }
+        else {
+            printBoardBlack(new ChessBoard());
+        }
     }
 
-    private void printBoard(ChessBoard board) {
+    private void printBoardBlack(ChessBoard board) {
         board.resetBoard();
         for (int i = 8; i >= 1; i -= 1) {
             for (int j = 1; j <= 8; j += 1) {
@@ -183,6 +192,35 @@ public class Repl {
         System.out.print("\u001b[39;49;1m\n");
         for (int i = 1; i <= 8; i += 1) {
             for (int j = 8; j >= 1; j -= 1) {
+                if ((i + j) % 2 == 0) {
+                    System.out.print("\u001b[39;44;1m");
+                }
+                else {
+                    System.out.print("\u001b[39;41;1m");
+                }
+                printPiece(board.getPiece(new ChessPosition(i ,j)));
+            }
+            System.out.print("\u001b[39;49;1m\n");
+        }
+    }
+
+    private void printBoardWhite(ChessBoard board) {
+        board.resetBoard();
+        for (int i = 1; i <= 8; i += 1) {
+            for (int j = 8; j >= 1; j -= 1) {
+                if ((i + j) % 2 == 0) {
+                    System.out.print("\u001b[39;44;1m");
+                }
+                else {
+                    System.out.print("\u001b[39;41;1m");
+                }
+                printPiece(board.getPiece(new ChessPosition(i ,j)));
+            }
+            System.out.print("\u001b[39;49;1m\n");
+        }
+        System.out.print("\u001b[39;49;1m\n");
+        for (int i = 8; i >= 1; i -= 1) {
+            for (int j = 1; j <= 8; j += 1) {
                 if ((i + j) % 2 == 0) {
                     System.out.print("\u001b[39;44;1m");
                 }
