@@ -178,55 +178,68 @@ public class Repl {
                 }
                 printPiece(board.getPiece(new ChessPosition(i ,j)));
             }
-            System.out.print("\n");
+            System.out.print("\u001b[39;49;1m\n");
+        }
+        System.out.print("\u001b[39;49;1m\n");
+        for (int i = 1; i <= 8; i += 1) {
+            for (int j = 8; j >= 1; j -= 1) {
+                if ((i + j) % 2 == 0) {
+                    System.out.print("\u001b[39;44;1m");
+                }
+                else {
+                    System.out.print("\u001b[39;41;1m");
+                }
+                printPiece(board.getPiece(new ChessPosition(i ,j)));
+            }
+            System.out.print("\u001b[39;49;1m\n");
         }
     }
 
     private void printPiece(chess.ChessPiece piece) {
         if (piece == null) {
-            System.out.print("  ");
+            System.out.print(EMPTY);
         }
         else {
             ChessPiece.PieceType type = piece.getPieceType();
             if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
                 if (type == ChessPiece.PieceType.PAWN) {
-                    System.out.print(WHITE_PAWN);
+                    System.out.print("\u001b[97m" + BLACK_PAWN);
                 }
                 else if (type == ChessPiece.PieceType.ROOK) {
-                    System.out.print(WHITE_ROOK);
+                    System.out.print("\u001b[97m" + BLACK_ROOK);
                 }
                 else if (type == ChessPiece.PieceType.BISHOP) {
-                    System.out.print(WHITE_BISHOP);
+                    System.out.print("\u001b[97m" + BLACK_BISHOP);
                 }
                 else if (type == ChessPiece.PieceType.KNIGHT) {
-                    System.out.print(WHITE_KNIGHT);
+                    System.out.print("\u001b[97m" + BLACK_KNIGHT);
                 }
                 else if (type == ChessPiece.PieceType.QUEEN) {
-                    System.out.print(WHITE_QUEEN);
+                    System.out.print("\u001b[97m" + BLACK_QUEEN);
                 }
                 else if (type == ChessPiece.PieceType.KING) {
-                    System.out.print(WHITE_KING);
+                    System.out.print("\u001b[97m" + BLACK_KING);
                 }
             }
 
             else if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
                 if (type == ChessPiece.PieceType.PAWN) {
-                    System.out.print(BLACK_PAWN);
+                    System.out.print("\u001b[30m" + BLACK_PAWN);
                 }
                 else if (type == ChessPiece.PieceType.ROOK) {
-                    System.out.print(BLACK_ROOK);
+                    System.out.print("\u001b[30m" + BLACK_ROOK);
                 }
                 else if (type == ChessPiece.PieceType.BISHOP) {
-                    System.out.print(BLACK_BISHOP);
+                    System.out.print("\u001b[30m" + BLACK_BISHOP);
                 }
                 else if (type == ChessPiece.PieceType.KNIGHT) {
-                    System.out.print(BLACK_KNIGHT);
+                    System.out.print("\u001b[30m" + BLACK_KNIGHT);
                 }
                 else if (type == ChessPiece.PieceType.QUEEN) {
-                    System.out.print(BLACK_QUEEN);
+                    System.out.print("\u001b[30m" + BLACK_QUEEN);
                 }
                 else if (type == ChessPiece.PieceType.KING) {
-                    System.out.print(BLACK_KING);
+                    System.out.print("\u001b[30m" + BLACK_KING);
                 }
             }
         }
