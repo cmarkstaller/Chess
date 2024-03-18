@@ -5,10 +5,10 @@ import com.google.gson.Gson;
 import dataAccess.Exceptions.ClientExceptionWrapper;
 import model.*;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URI;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class ServerFacade {
         this.port = port;
     }
 
-    public String register(String username, String password, String email) throws Exception {
+    public void register(String username, String password, String email) throws IOException, URISyntaxException, ClientExceptionWrapper {
         // Specify the desired endpoint
         URI uri = new URI("http://localhost:" + this.port + "/user");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
@@ -50,19 +50,19 @@ public class ServerFacade {
                     InputStreamReader inputStreamReader = new InputStreamReader(respBody);
                     AuthData authData = new Gson().fromJson(inputStreamReader, AuthData.class);
                     authToken = authData.authToken();
-                    return ("Success");
+                    return;
                 }
             default:
                 try (InputStream errorStream = http.getErrorStream()) {
                     InputStreamReader errorStreamReader = new InputStreamReader(errorStream);
                     ResponseMessage errorResponse = new Gson().fromJson(errorStreamReader, ResponseMessage.class);
 
-                    return(errorResponse.message());
+                    throw new ClientExceptionWrapper(errorResponse.message());
                 }
         }
     }
 
-    public String login(String username, String password) throws Exception {
+    public void login(String username, String password) throws IOException, URISyntaxException, ClientExceptionWrapper {
         // Specify the desired endpoint
         URI uri = new URI("http://localhost:" + this.port + "/session");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
@@ -91,19 +91,19 @@ public class ServerFacade {
                     InputStreamReader inputStreamReader = new InputStreamReader(respBody);
                     AuthData authData = new Gson().fromJson(inputStreamReader, AuthData.class);
                     authToken = authData.authToken();
-                    return ("Success");
+                    return;
                 }
             default:
                 try (InputStream errorStream = http.getErrorStream()) {
                     InputStreamReader errorStreamReader = new InputStreamReader(errorStream);
                     ResponseMessage errorResponse = new Gson().fromJson(errorStreamReader, ResponseMessage.class);
 
-                    return(errorResponse.message());
+                    throw new ClientExceptionWrapper(errorResponse.message());
                 }
         }
     }
 
-    public String logout() throws Exception {
+    public void logout() throws IOException, URISyntaxException, ClientExceptionWrapper {
         // Specify the desired endpoint
         URI uri = new URI("http://localhost:" + this.port + "/session");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
@@ -123,18 +123,18 @@ public class ServerFacade {
         int responseCode = http.getResponseCode();
         switch(responseCode) {
             case 200:
-                return ("Success");
+                return;
             default:
                 try (InputStream errorStream = http.getErrorStream()) {
                     InputStreamReader errorStreamReader = new InputStreamReader(errorStream);
                     ResponseMessage errorResponse = new Gson().fromJson(errorStreamReader, ResponseMessage.class);
 
-                    return(errorResponse.message());
+                    throw new ClientExceptionWrapper(errorResponse.message());
                 }
         }
     }
 
-    public String createGame(String gameName) throws Exception {
+    public int createGame(String gameName) throws IOException, URISyntaxException, ClientExceptionWrapper {
         // Specify the desired endpoint
         URI uri = new URI("http://localhost:" + this.port + "/game");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
@@ -163,20 +163,21 @@ public class ServerFacade {
                 try (InputStream respBody = http.getInputStream()) {
                     InputStreamReader inputStreamReader = new InputStreamReader(respBody);
                     int gameID = new Gson().fromJson(inputStreamReader, CreateGameResponse.class).gameID();
-                    return (String.valueOf(gameID));
+                    return (gameID);
                 }
+
             default:
                 try (InputStream errorStream = http.getErrorStream()) {
                     InputStreamReader errorStreamReader = new InputStreamReader(errorStream);
                     ResponseMessage errorResponse = new Gson().fromJson(errorStreamReader, ResponseMessage.class);
 
-                    return(errorResponse.message());
+                    throw new ClientExceptionWrapper(errorResponse.message());
                 }
         }
     }
 
     // Spark.get("/game", handler::listGames);
-    public Collection<ListGamesResponse> listGames() throws Exception {
+    public Collection<ListGamesResponse> listGames() throws IOException, URISyntaxException, ClientExceptionWrapper {
         // Specify the desired endpoint
         URI uri = new URI("http://localhost:" + this.port + "/game");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();
@@ -210,7 +211,7 @@ public class ServerFacade {
         }
     }
 
-    public void joinGame(ChessGame.TeamColor teamColor, int gameID) throws Exception {
+    public void joinGame(ChessGame.TeamColor teamColor, int gameID) throws URISyntaxException, IOException, ClientExceptionWrapper {
         // Specify the desired endpoint
         URI uri = new URI("http://localhost:" + this.port + "/game");
         HttpURLConnection http = (HttpURLConnection) uri.toURL().openConnection();

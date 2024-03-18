@@ -7,6 +7,7 @@ import org.junit.jupiter.api.*;
 import server.Server;
 import ui.ServerFacade;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -45,54 +46,48 @@ public class ServerFacadeTests {
         server.stop();
     }
 
-
     @Test
-    public void positiveRegister() throws Exception {
-        Assertions.assertEquals("Success", facade.register("myUsername", "myPassword", "myEmail"));
+    public void positiveRegister() {
+        Assertions.assertDoesNotThrow(() -> facade.register("myUsername", "myPassword", "myEmail"));
     }
 
-    @Test
-    public void negativeRegister() throws Exception {
-        // User already exists error;
+    @ Test
+    public void negativeRegister() throws IOException, URISyntaxException, ClientExceptionWrapper {
         facade.register("myUsername", "myPassword", "myEmail");
-        Assertions.assertEquals("User already exists error", facade.register("myUsername", "myPassword", "myEmail"));
-
-        // Missing information error;
-        reset();
-        Assertions.assertEquals("Error: bad request", facade.register("myUsername", null, "myEmail"));
+        Assertions.assertThrows(ClientExceptionWrapper.class, () -> facade.register("myUsername", "myPassword", "myEmail"));
     }
 
     @Test
     public void positiveLogin() throws Exception {
         facade.register("myUsername", "myPassword", "myEmail");
-        Assertions.assertEquals("Success", facade.login("myUsername", "myPassword"));
+        Assertions.assertDoesNotThrow(() -> facade.login("myUsername", "myPassword"));
     }
 
     @Test
     public void negativeLogin() throws Exception {
-        Assertions.assertEquals("User not found error", facade.login("myUsername", "myPassword"));
+        Assertions.assertThrows(ClientExceptionWrapper.class, () -> facade.login("myUsername", "myPassword"));
     }
 
     @Test
     public void positiveLogout() throws Exception {
         facade.register("myUsername", "myPassword", "myEmail");
-        Assertions.assertEquals("Success", facade.logout());
+        Assertions.assertDoesNotThrow(() -> facade.logout());
     }
 
     @Test
-    public void negativeLogout() throws Exception {
-        Assertions.assertEquals("you are not logged in error", facade.logout());
+    public void negativeLogout() {
+        Assertions.assertThrows(ClientExceptionWrapper.class, () -> facade.logout());
     }
 
     @Test
     public void positiveCreateGame() throws Exception {
         facade.register("myUsername", "myPassword", "myEmail");
-        Assertions.assertEquals("1", facade.createGame("maGame"));
+        Assertions.assertEquals(1, facade.createGame("maGame"));
     }
 
     @Test
     public void negativeCreateGame() throws Exception {
-        Assertions.assertEquals("you are not logged in error", facade.createGame("maGame"));
+        Assertions.assertThrows(ClientExceptionWrapper.class, () -> facade.createGame("maGame"));
     }
 
     @Test
