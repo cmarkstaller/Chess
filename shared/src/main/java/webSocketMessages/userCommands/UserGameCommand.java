@@ -9,7 +9,6 @@ import java.util.Objects;
  * methods.
  */
 public class UserGameCommand {
-
     public UserGameCommand(String authToken) {
         this.authToken = authToken;
     }
