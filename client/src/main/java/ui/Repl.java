@@ -7,6 +7,7 @@ import chess.ChessPosition;
 import dataAccess.Exceptions.ClientExceptionWrapper;
 import model.ListGamesResponse;
 
+import javax.websocket.DeploymentException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -167,6 +168,20 @@ public class Repl {
     }
 
     public void gamePlay(ChessGame.TeamColor color) {
+        try {
+            WebSocketFacade webSocketFacade = new WebSocketFacade();
+            try {
+                webSocketFacade.send("myMessage");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } catch (DeploymentException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
         if (color == ChessGame.TeamColor.WHITE) {
             printBoardWhite(new ChessBoard());
         }

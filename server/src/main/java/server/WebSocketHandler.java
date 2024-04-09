@@ -11,7 +11,7 @@ import java.util.Timer;
 
 @WebSocket
 public class WebSocketHandler {
-    //WebSocketSessions sessions;
+    WebSocketSessions sessions;
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
