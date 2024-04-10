@@ -17,10 +17,7 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
-import webSocketMessages.userCommands.JoinObserver;
-import webSocketMessages.userCommands.JoinPlayer;
-import webSocketMessages.userCommands.MakeMove;
-import webSocketMessages.userCommands.UserGameCommand;
+import webSocketMessages.userCommands.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -42,6 +39,8 @@ public class WebSocketHandler {
             case JOIN_PLAYER -> this.joinPlayerHandler(session, message);
             case JOIN_OBSERVER -> this.joinObserverHandler(session, message);
             case MAKE_MOVE -> this.makeMoveHandler(session, message);
+            case RESIGN -> this.resignHandler(session, message);
+            case LEAVE -> this.leaveHandler(session, message);
 
         }
     }
@@ -132,7 +131,8 @@ public class WebSocketHandler {
             if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) ||
                     chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) ||
                     chessGame.isInStalemate(ChessGame.TeamColor.WHITE) ||
-                    chessGame.isInStalemate(ChessGame.TeamColor.BLACK)
+                    chessGame.isInStalemate(ChessGame.TeamColor.BLACK) ||
+                    chessGame.getTeamTurn() == ChessGame.TeamColor.GAMEOVER
             ){
                 throw new InvalidMoveException("Ur Done error");
             }
@@ -149,6 +149,65 @@ public class WebSocketHandler {
         } catch (DataAccessException | InvalidMoveException e) {
             sendMessage(session, gson.toJson(new Error("You've got mail, error")));
         }
+    }
+
+    private void resignHandler(Session session, String message) {
+        Gson gson = new Gson();
+        try {
+            Resign resign = new Gson().fromJson(message, Resign.class);
+            String username = authDao.getAuth(resign.getAuthString()).username();
+
+            if (getTeamColor(resign.getGameID(), username) == null) {
+                throw new DataAccessException("Error: Observer can't resign game");
+            }
+            GameData gameData = gameDao.getGame(resign.getGameID());
+            ChessGame chessGame = gameData.game();
+
+            if (chessGame.getTeamTurn() == ChessGame.TeamColor.GAMEOVER) {
+                throw new DataAccessException("Error: Game already resigned");
+            }
+
+            chessGame.setTeamTurn(ChessGame.TeamColor.GAMEOVER);
+
+            GameData newGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), chessGame);
+            gameDao.updateGame(resign.getGameID(), newGameData);
+
+            sendMessage(session, gson.toJson(new Notification("You have resigned the game")));
+            broadCastMessage(resign.getGameID(), gson.toJson(new Notification(username + " has resigned")), resign.getAuthString());
+
+        } catch (DataAccessException e) {
+            sendMessage(session, gson.toJson(new Error("You've got mail, error")));
+        }
+    }
+
+    private void leaveHandler(Session session, String message) {
+        Gson gson = new Gson();
+        try {
+            Leave leave = new Gson().fromJson(message, Leave.class);
+            String username = authDao.getAuth(leave.getAuthString()).username();
+            ChessGame.TeamColor rootTeamColor = getTeamColor(leave.getGameID(), username);
+
+            if (rootTeamColor != null) {
+                GameData gameData = gameDao.getGame(leave.getGameID());
+                ChessGame chessGame = gameData.game();
+                GameData newGameData;
+                if (rootTeamColor == ChessGame.TeamColor.WHITE) {
+                    newGameData = new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.gameName(), chessGame);
+                }
+                else {
+                    newGameData = new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), chessGame);
+                }
+                gameDao.updateGame(leave.getGameID(), newGameData);
+            }
+
+            broadCastMessage(leave.getGameID(), gson.toJson(new Notification(username + " has left the game")), leave.getAuthString());
+
+            sessions.removeSessionFromGame(leave.getGameID(), leave.getAuthString(), session);
+
+        } catch (DataAccessException e) {
+            sendMessage(session, gson.toJson(new Error("You've got mail, error")));
+        }
+
     }
 
     private void sendMessage(Session session, String message) {
@@ -213,6 +272,11 @@ public class WebSocketHandler {
     private String makeMoveNotification(ChessMove chessMove) {
         String message = chessMove.toString();
 
+        Gson gson = new Gson();
+        return(gson.toJson(new Notification(message)));
+    }
+
+    private String resignNotification(String message) {
         Gson gson = new Gson();
         return(gson.toJson(new Notification(message)));
     }
