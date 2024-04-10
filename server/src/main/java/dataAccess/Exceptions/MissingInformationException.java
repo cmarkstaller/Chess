@@ -1,6 +1,6 @@
 package dataAccess.Exceptions;
 
-import dataAccess.DataAccessException;
+//import dataAccess.DataAccessException;
 
 public class MissingInformationException extends dataAccess.Exceptions.DataAccessException {
     public MissingInformationException(String message) {
