@@ -96,13 +96,13 @@ public class ChessGame {
     // Here is when you care about color. Make move calls valid Moves
     public void makeMove(ChessMove move) throws InvalidMoveException {
         if (board.getPiece(move.getStartPosition()).getTeamColor() != this.color) {
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("Tried to move piece that wasn't yours error");
         }
         if (this.validMoves(move.getStartPosition()).contains(move)) {
             movePiece(move, this.board);
         }
         else {
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("You tried to move a null, or a piece really far error");
         }
         if (this.color == TeamColor.WHITE) {
             this.color = TeamColor.BLACK;
