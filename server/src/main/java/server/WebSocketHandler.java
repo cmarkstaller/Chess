@@ -153,7 +153,9 @@ public class WebSocketHandler {
 
     private void sendMessage(Session session, String message) {
         try {
-            session.getRemote().sendString(message);
+            if (session.isOpen()) {
+                session.getRemote().sendString(message);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

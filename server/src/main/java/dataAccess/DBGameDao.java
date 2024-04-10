@@ -25,7 +25,8 @@ public class DBGameDao implements GameDao {
         configureDatabase();
         var statement = "INSERT INTO GameData (whiteUsername, blackUsername, gameName, chessGame) VALUES (?, ?, ?, ?)";
         //game.game().getBoard().resetBoard();
-        return(executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), new Gson().toJson(game.game())));
+        String maGson = new Gson().toJson(game.game());
+        return(executeUpdate(statement, game.whiteUsername(), game.blackUsername(), game.gameName(), maGson));
     }
 
     public GameData getGame(int gameID) throws DataAccessException  {
@@ -54,7 +55,7 @@ public class DBGameDao implements GameDao {
         }
         configureDatabase();
         var statement = "UPDATE GameData SET whiteUsername = ?, blackUsername = ?, chessGame = ? WHERE gameID = ?";
-        executeUpdate(statement, game.whiteUsername(), game.blackUsername(), new Gson().toJson(game), gameID);
+        executeUpdate(statement, game.whiteUsername(), game.blackUsername(), new Gson().toJson(game.game()), gameID);
     }
 
     public Collection<GameData> listGames() throws DataAccessException {
