@@ -1,7 +1,7 @@
 package clientTests;
 
 import chess.ChessGame;
-import dataAccess.Exceptions.ClientExceptionWrapper;
+import ui.ClientExceptionWrapper;
 import model.ListGamesResponse;
 import org.junit.jupiter.api.*;
 import server.Server;

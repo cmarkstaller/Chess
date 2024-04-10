@@ -2,16 +2,13 @@ package ui;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import dataAccess.Exceptions.ClientExceptionWrapper;
 import model.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 public class ServerFacade {
     private final int port;

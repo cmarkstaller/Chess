@@ -1,10 +1,8 @@
 package ui;
 
 import chess.*;
-import dataAccess.Exceptions.ClientExceptionWrapper;
 import model.ListGamesResponse;
 
-import javax.websocket.DeploymentException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Collection;
