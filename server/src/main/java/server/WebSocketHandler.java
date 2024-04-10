@@ -3,6 +3,9 @@ import chess.ChessGame;
 import dataAccess.*;
 import dataAccess.Exceptions.ColorAlreadyTakenException;
 import dataAccess.Exceptions.DataAccessException;
+import dataAccess.Exceptions.GameDoesntExistException;
+import dataAccess.Exceptions.UserNotFoundException;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import org.eclipse.jetty.websocket.api.*;
 import com.google.gson.Gson;
@@ -41,21 +44,32 @@ public class WebSocketHandler {
         Gson gson = new Gson();
         try {
             JoinPlayer joinPlayer = new Gson().fromJson(message, JoinPlayer.class);
-            sessions.addSessionToGame(joinPlayer.getGameID(), joinPlayer.getAuthString(), session);
+
+            // Bad authToken
+            if (authDao.getAuth(joinPlayer.getAuthString()) == null) {
+                throw new UserNotFoundException("User doesn't exist");
+            }
+
             String username = authDao.getAuth(joinPlayer.getAuthString()).username();
 
+            // Bad Game ID
+            if (gameDao.getGame(joinPlayer.getGameID()) == null) {
+                throw new GameDoesntExistException("Game Doesn't Exist Error");
+            }
+
+            // Player joins wrong color / without color
             if (joinPlayer.getTeamColor() == ChessGame.TeamColor.WHITE) {
                 if (!Objects.equals(gameDao.getGame(joinPlayer.getGameID()).whiteUsername(), username)) {
                     throw new ColorAlreadyTakenException("Join Player Wrong Team Error");
                 }
             }
-
             else if (joinPlayer.getTeamColor() == ChessGame.TeamColor.BLACK) {
                 if (!Objects.equals(gameDao.getGame(joinPlayer.getGameID()).blackUsername(), username)) {
                     throw new ColorAlreadyTakenException("Join Player Wrong Team Error");
                 }
             }
 
+            sessions.addSessionToGame(joinPlayer.getGameID(), joinPlayer.getAuthString(), session);
             sendMessage(session, loadGameConstructor(joinPlayer.getGameID()));
             broadCastMessage(joinPlayer.getGameID(), joinPlayerNotification(username, joinPlayer.getTeamColor()), joinPlayer.getAuthString());
         } catch (DataAccessException e) {
