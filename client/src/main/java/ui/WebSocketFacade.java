@@ -1,10 +1,14 @@
 package ui;
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinPlayer;
+import webSocketMessages.userCommands.Leave;
+import webSocketMessages.userCommands.MakeMove;
+import webSocketMessages.userCommands.Resign;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -37,6 +41,20 @@ public class WebSocketFacade extends Endpoint {
     public void joinPlayer(String authToken, int gameID, ChessGame.TeamColor playerColor) throws Exception {
         Gson gson = new Gson();
         send(gson.toJson(new JoinPlayer(authToken, gameID, playerColor)));
+    }
+
+    public void leave(String authToken, int gameID) throws Exception {
+        Gson gson = new Gson();
+        send(gson.toJson(new Leave(authToken, gameID)));
+    }
+    public void makeMove(String authToken, int gameID, ChessMove move) throws Exception {
+        Gson gson = new Gson();
+        send(gson.toJson(new MakeMove(authToken, gameID, move)));
+    }
+
+    public void resign(String authToken, int gameID) throws Exception {
+        Gson gson = new Gson();
+        send(gson.toJson(new Resign(authToken, gameID)));
     }
 
     public void send(String msg) throws Exception {

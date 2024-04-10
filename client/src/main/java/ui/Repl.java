@@ -1,9 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import dataAccess.Exceptions.ClientExceptionWrapper;
 import model.ListGamesResponse;
 
@@ -118,7 +115,6 @@ public class Repl implements GameHandler {
             }
 
             else if (userInput[0].equals("join")) {
-                // ChessGame.TeamColor teamColor = null;
                 if (userInput[1].equals("white")) {teamColor = ChessGame.TeamColor.WHITE;}
                 else if (userInput[1].equals("black")) {teamColor = ChessGame.TeamColor.BLACK;}
 
@@ -191,7 +187,7 @@ public class Repl implements GameHandler {
         webSocketFacade.joinPlayer(authToken, gameID, teamColor);
 
         while (true) {
-            System.out.print("[" + this.username + "] gameplay>>> ");
+            System.out.print("[" + this.username + "] >>> ");
             Scanner scanner = new Scanner(System.in);
             String line = scanner.nextLine();
             var userInput = line.split(" ");
@@ -200,13 +196,33 @@ public class Repl implements GameHandler {
                 System.out.println("\nCommands\n" +
                         ">>> redraw\n" +
                         ">>> leave\n" +
-                        ">>> make move <row> <col> <row> <col>\n" +
+                        ">>> move <row> <col> <row> <col>\n" +
                         ">>> resign\n" +
-                        ">>> highlight\n");
+                        ">>> highlight <row> <col>\n");
             }
 
             else if (userInput[0].equals("redraw")) {
                 printBoard(teamColor, currentGame.getBoard());
+            }
+
+            else if (userInput[0].equals("leave")) {
+                webSocketFacade.leave(authToken, gameID);
+                return;
+            }
+
+            else if (userInput[0].equals("move")) {
+                ChessPosition startPos = new ChessPosition(Integer.parseInt(userInput[1]), Integer.parseInt(userInput[2]));
+                ChessPosition endPos = new ChessPosition(Integer.parseInt(userInput[3]), Integer.parseInt(userInput[4]));
+                ChessMove move = new ChessMove(startPos, endPos, null);
+                webSocketFacade.makeMove(authToken, gameID, move);
+            }
+            else if (userInput[0].equals("resign")) {
+                webSocketFacade.resign(authToken, gameID);
+            }
+
+            else if (userInput[0].equals("hightlight")) {
+                ChessPosition piecePos = new ChessPosition(Integer.parseInt(userInput[1]), Integer.parseInt(userInput[2]));
+                Collection<ChessMove> validMoves = currentGame.validMoves(piecePos);
             }
         }
     }
@@ -221,19 +237,6 @@ public class Repl implements GameHandler {
     }
 
     public static void printBoardBlack(ChessBoard board) {
-//        for (int i = 8; i >= 1; i -= 1) {
-//            for (int j = 1; j <= 8; j += 1) {
-//                if ((i + j) % 2 == 0) {
-//                    System.out.print("\u001b[39;44;1m");
-//                }
-//                else {
-//                    System.out.print("\u001b[39;41;1m");
-//                }
-//                printPiece(board.getPiece(new ChessPosition(i ,j)));
-//            }
-//            System.out.print("\u001b[39;49;1m\n");
-//        }
-//        System.out.print("\u001b[39;49;1m\n");
         for (int i = 1; i <= 8; i += 1) {
             for (int j = 8; j >= 1; j -= 1) {
                 if ((i + j) % 2 == 0) {
@@ -249,19 +252,6 @@ public class Repl implements GameHandler {
     }
 
     public static void printBoardWhite(ChessBoard board) {
-//        for (int i = 1; i <= 8; i += 1) {
-//            for (int j = 8; j >= 1; j -= 1) {
-//                if ((i + j) % 2 == 0) {
-//                    System.out.print("\u001b[39;44;1m");
-//                }
-//                else {
-//                    System.out.print("\u001b[39;41;1m");
-//                }
-//                printPiece(board.getPiece(new ChessPosition(i ,j)));
-//            }
-//            System.out.print("\u001b[39;49;1m\n");
-//        }
-//        System.out.print("\u001b[39;49;1m\n");
         for (int i = 8; i >= 1; i -= 1) {
             for (int j = 1; j <= 8; j += 1) {
                 if ((i + j) % 2 == 0) {
