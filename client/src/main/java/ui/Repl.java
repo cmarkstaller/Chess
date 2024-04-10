@@ -15,12 +15,23 @@ import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
-public class Repl {
+public class Repl implements GameHandler {
     private ServerFacade facade;
     private String username;
+
+    private int port;
     public Repl(int port) {
         this.facade = new ServerFacade(port);
         this.username = "Logged Out";
+        this.port = port;
+    }
+
+    public void updateGame(ChessGame chessGame) {
+        System.out.println("imaginary chess game");
+    }
+
+    public void printMessage(String message) {
+        System.out.println(message);
     }
     public void preLogin() {
         while (true) {
@@ -169,12 +180,12 @@ public class Repl {
 
     public void gamePlay(ChessGame.TeamColor color) {
         try {
-            WebSocketFacade webSocketFacade = new WebSocketFacade();
-            try {
-                webSocketFacade.send("myMessage");
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            WebSocketFacade webSocketFacade = new WebSocketFacade(this.port, this);
+//            try {
+//                webSocketFacade.joinPlayer(facade.);
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
         } catch (DeploymentException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
@@ -190,7 +201,7 @@ public class Repl {
         }
     }
 
-    private void printBoardBlack(ChessBoard board) {
+    public static void printBoardBlack(ChessBoard board) {
         board.resetBoard();
         for (int i = 8; i >= 1; i -= 1) {
             for (int j = 1; j <= 8; j += 1) {
@@ -219,7 +230,7 @@ public class Repl {
         }
     }
 
-    private void printBoardWhite(ChessBoard board) {
+    public static void printBoardWhite(ChessBoard board) {
         board.resetBoard();
         for (int i = 1; i <= 8; i += 1) {
             for (int j = 8; j >= 1; j -= 1) {
@@ -248,7 +259,7 @@ public class Repl {
         }
     }
 
-    private void printPiece(chess.ChessPiece piece) {
+    public static void printPiece(chess.ChessPiece piece) {
         if (piece == null) {
             System.out.print(EMPTY);
         }
