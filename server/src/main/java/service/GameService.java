@@ -33,7 +33,10 @@ public class GameService {
             throw new NotLoggedInException("you are not logged in error");
         }
         auth.getAuth(authToken);
-        GameData newGame = new GameData(game.indexID(), null, null, gameName, new ChessGame());
+
+        ChessGame starterGame = new ChessGame();
+        starterGame.getBoard().resetBoard();
+        GameData newGame = new GameData(game.indexID(), null, null, gameName, starterGame);
         return(game.insertGame(newGame));
     }
 
