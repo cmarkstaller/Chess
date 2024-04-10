@@ -1,14 +1,14 @@
 import chess.*;
-import server.Server;
+//import server.Server;
 import ui.Repl;
-import ui.ServerFacade;
+//import ui.ServerFacade;
 
 public class Main {
     public static void main(String[] args) throws Exception {
         int port = 8080;
 
-        Server myServer = new Server();
-        myServer.run(port);
+//        Server myServer = new Server();
+//        myServer.run(port);
         var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
         System.out.println("♕ 240 Chess Client: " + piece);
 
