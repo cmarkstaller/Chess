@@ -18,8 +18,10 @@ import static ui.EscapeSequences.*;
 public class Repl implements GameHandler {
     private ServerFacade facade;
     private String username;
-
     private int port;
+    private ChessGame currentGame;
+    private ChessGame.TeamColor teamColor;
+
     public Repl(int port) {
         this.facade = new ServerFacade(port);
         this.username = "Logged Out";
@@ -27,13 +29,15 @@ public class Repl implements GameHandler {
     }
 
     public void updateGame(ChessGame chessGame) {
-        System.out.println("imaginary chess game");
+        this.currentGame = chessGame;
+        printBoard(teamColor, chessGame.getBoard());
+
     }
 
     public void printMessage(String message) {
         System.out.println(message);
     }
-    public void preLogin() {
+    public void preLogin() throws Exception {
         while (true) {
             System.out.print("[" + this.username + "] >>> ");
             Scanner scanner = new Scanner(System.in);
@@ -84,7 +88,7 @@ public class Repl implements GameHandler {
         }
     }
 
-    public void postLogin() {
+    public void postLogin() throws Exception {
         while (true) {
             System.out.print("[" + this.username + "] >>> ");
             Scanner scanner = new Scanner(System.in);
@@ -114,14 +118,16 @@ public class Repl implements GameHandler {
             }
 
             else if (userInput[0].equals("join")) {
-                ChessGame.TeamColor teamColor = null;
+                // ChessGame.TeamColor teamColor = null;
                 if (userInput[1].equals("white")) {teamColor = ChessGame.TeamColor.WHITE;}
                 else if (userInput[1].equals("black")) {teamColor = ChessGame.TeamColor.BLACK;}
 
                 try {
-                    facade.joinGame(teamColor, Integer.parseInt(userInput[2]));
+                    int gameID = Integer.parseInt(userInput[2]);
+                    String authToken = facade.getAuthToken();
+                    facade.joinGame(teamColor, gameID);
                     System.out.println("joining game");
-                    gamePlay(teamColor);
+                    gamePlay(gameID, authToken);
                 } catch (ClientExceptionWrapper e) {
                     System.out.println(e.getMessage());
                 } catch (ArrayIndexOutOfBoundsException e) {
@@ -135,9 +141,11 @@ public class Repl implements GameHandler {
 
             else if (userInput[0].equals("observe")) {
                 try {
-                    facade.joinGame(null, Integer.parseInt(userInput[1]));
+                    int gameID = Integer.parseInt(userInput[1]);
+                    String authToken = facade.getAuthToken();
+                    facade.joinGame(null, gameID);
                     System.out.println("observing game");
-                    gamePlay(ChessGame.TeamColor.WHITE);
+                    gamePlay(gameID, authToken);
 
                 } catch (ClientExceptionWrapper e) {
                     System.out.println(e.getMessage());
@@ -178,44 +186,54 @@ public class Repl implements GameHandler {
         }
     }
 
-    public void gamePlay(ChessGame.TeamColor color) {
-        try {
-            WebSocketFacade webSocketFacade = new WebSocketFacade(this.port, this);
-//            try {
-//                webSocketFacade.joinPlayer(facade.);
-//            } catch (Exception e) {
-//                throw new RuntimeException(e);
-//            }
-        } catch (DeploymentException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+    public void gamePlay(int gameID, String authToken) throws Exception {
+        WebSocketFacade webSocketFacade = new WebSocketFacade(this.port, this);
+        webSocketFacade.joinPlayer(authToken, gameID, teamColor);
+
+        while (true) {
+            System.out.print("[" + this.username + "] gameplay>>> ");
+            Scanner scanner = new Scanner(System.in);
+            String line = scanner.nextLine();
+            var userInput = line.split(" ");
+
+            if (userInput[0].equals("help")) {
+                System.out.println("\nCommands\n" +
+                        ">>> redraw\n" +
+                        ">>> leave\n" +
+                        ">>> make move <row> <col> <row> <col>\n" +
+                        ">>> resign\n" +
+                        ">>> highlight\n");
+            }
+
+            else if (userInput[0].equals("redraw")) {
+                printBoard(teamColor, currentGame.getBoard());
+            }
         }
-        if (color == ChessGame.TeamColor.WHITE) {
-            printBoardWhite(new ChessBoard());
+    }
+
+    public void printBoard(ChessGame.TeamColor teamColor, ChessBoard chessBoard) {
+        if (teamColor == ChessGame.TeamColor.WHITE) {
+            printBoardWhite(chessBoard);
         }
-        else {
-            printBoardBlack(new ChessBoard());
+        else if (teamColor == ChessGame.TeamColor.BLACK) {
+            printBoardBlack(chessBoard);
         }
     }
 
     public static void printBoardBlack(ChessBoard board) {
-        board.resetBoard();
-        for (int i = 8; i >= 1; i -= 1) {
-            for (int j = 1; j <= 8; j += 1) {
-                if ((i + j) % 2 == 0) {
-                    System.out.print("\u001b[39;44;1m");
-                }
-                else {
-                    System.out.print("\u001b[39;41;1m");
-                }
-                printPiece(board.getPiece(new ChessPosition(i ,j)));
-            }
-            System.out.print("\u001b[39;49;1m\n");
-        }
-        System.out.print("\u001b[39;49;1m\n");
+//        for (int i = 8; i >= 1; i -= 1) {
+//            for (int j = 1; j <= 8; j += 1) {
+//                if ((i + j) % 2 == 0) {
+//                    System.out.print("\u001b[39;44;1m");
+//                }
+//                else {
+//                    System.out.print("\u001b[39;41;1m");
+//                }
+//                printPiece(board.getPiece(new ChessPosition(i ,j)));
+//            }
+//            System.out.print("\u001b[39;49;1m\n");
+//        }
+//        System.out.print("\u001b[39;49;1m\n");
         for (int i = 1; i <= 8; i += 1) {
             for (int j = 8; j >= 1; j -= 1) {
                 if ((i + j) % 2 == 0) {
@@ -231,20 +249,19 @@ public class Repl implements GameHandler {
     }
 
     public static void printBoardWhite(ChessBoard board) {
-        board.resetBoard();
-        for (int i = 1; i <= 8; i += 1) {
-            for (int j = 8; j >= 1; j -= 1) {
-                if ((i + j) % 2 == 0) {
-                    System.out.print("\u001b[39;44;1m");
-                }
-                else {
-                    System.out.print("\u001b[39;41;1m");
-                }
-                printPiece(board.getPiece(new ChessPosition(i ,j)));
-            }
-            System.out.print("\u001b[39;49;1m\n");
-        }
-        System.out.print("\u001b[39;49;1m\n");
+//        for (int i = 1; i <= 8; i += 1) {
+//            for (int j = 8; j >= 1; j -= 1) {
+//                if ((i + j) % 2 == 0) {
+//                    System.out.print("\u001b[39;44;1m");
+//                }
+//                else {
+//                    System.out.print("\u001b[39;41;1m");
+//                }
+//                printPiece(board.getPiece(new ChessPosition(i ,j)));
+//            }
+//            System.out.print("\u001b[39;49;1m\n");
+//        }
+//        System.out.print("\u001b[39;49;1m\n");
         for (int i = 8; i >= 1; i -= 1) {
             for (int j = 1; j <= 8; j += 1) {
                 if ((i + j) % 2 == 0) {

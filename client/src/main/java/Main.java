@@ -4,7 +4,7 @@ import ui.Repl;
 import ui.ServerFacade;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         int port = 8080;
 
         Server myServer = new Server();

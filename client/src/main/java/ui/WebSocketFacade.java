@@ -2,6 +2,7 @@ package ui;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import webSocketMessages.serverMessages.LoadGame;
+import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
 import webSocketMessages.userCommands.JoinPlayer;
 
@@ -26,6 +27,8 @@ public class WebSocketFacade extends Endpoint {
 
                 switch (serverMessage.getServerMessageType()) {
                     case LOAD_GAME -> gameHandler.updateGame(new Gson().fromJson(message, LoadGame.class).getGame());
+                    case NOTIFICATION -> gameHandler.printMessage(new Gson().fromJson(message, Notification.class).getMessage());
+                    case ERROR -> gameHandler.printMessage(new Gson().fromJson(message, Notification.class).getMessage());
                 }
             }
         });
