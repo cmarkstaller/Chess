@@ -20,7 +20,7 @@ public class WebSocketSessions {
         sessionMap.get(gameID).put(authToken, session);
     }
     public void removeSessionFromGame(int gameID, String authToken, Session session) {
-        sessionMap.get(gameID).remove(authToken);
+        sessionMap.get(gameID).remove(authToken).close();
     }
 
     public Map<String, Session>getSessionsForGame(int gameID) {

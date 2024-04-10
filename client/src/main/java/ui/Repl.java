@@ -25,12 +25,14 @@ public class Repl implements GameHandler {
 
     public void updateGame(ChessGame chessGame) {
         this.currentGame = chessGame;
-        printBoard(teamColor, chessGame.getBoard());
-
+        System.out.print("\n");
+        printBoard(chessGame.getBoard(), null);
+        System.out.print("[" + this.username + "] >>> ");
     }
 
     public void printMessage(String message) {
         System.out.println(message);
+        System.out.print("[" + this.username + "] >>> ");
     }
     public void preLogin() throws Exception {
         while (true) {
@@ -139,6 +141,7 @@ public class Repl implements GameHandler {
                     String authToken = facade.getAuthToken();
                     facade.joinGame(null, gameID);
                     System.out.println("observing game");
+                    teamColor = null;
                     gamePlay(gameID, authToken);
 
                 } catch (ClientExceptionWrapper e) {
@@ -182,7 +185,13 @@ public class Repl implements GameHandler {
 
     public void gamePlay(int gameID, String authToken) throws Exception {
         WebSocketFacade webSocketFacade = new WebSocketFacade(this.port, this);
-        webSocketFacade.joinPlayer(authToken, gameID, teamColor);
+        if (teamColor == null) {
+            webSocketFacade.joinObserver(authToken, gameID);
+            teamColor = ChessGame.TeamColor.WHITE;
+        }
+        else {
+            webSocketFacade.joinPlayer(authToken, gameID, teamColor);
+        }
 
         while (true) {
             System.out.print("[" + this.username + "] >>> ");
@@ -200,7 +209,7 @@ public class Repl implements GameHandler {
             }
 
             else if (userInput[0].equals("redraw")) {
-                printBoard(teamColor, currentGame.getBoard());
+                printBoard(currentGame.getBoard(), null);
             }
 
             else if (userInput[0].equals("leave")) {
@@ -209,39 +218,67 @@ public class Repl implements GameHandler {
             }
 
             else if (userInput[0].equals("move")) {
-                ChessPosition startPos = new ChessPosition(Integer.parseInt(userInput[1]), Integer.parseInt(userInput[2]));
-                ChessPosition endPos = new ChessPosition(Integer.parseInt(userInput[3]), Integer.parseInt(userInput[4]));
-                ChessMove move = new ChessMove(startPos, endPos, null);
-                webSocketFacade.makeMove(authToken, gameID, move);
+                if (currentGame.getTeamTurn() != teamColor) {
+                    System.out.println("It is not your turn");
+                }
+                else {
+                    ChessPosition startPos = new ChessPosition(Integer.parseInt(userInput[1]), Integer.parseInt(userInput[2]));
+                    ChessPosition endPos = new ChessPosition(Integer.parseInt(userInput[3]), Integer.parseInt(userInput[4]));
+                    ChessMove move = new ChessMove(startPos, endPos, null);
+                    webSocketFacade.makeMove(authToken, gameID, move);
+                }
             }
             else if (userInput[0].equals("resign")) {
                 webSocketFacade.resign(authToken, gameID);
             }
 
-            else if (userInput[0].equals("hightlight")) {
+            else if (userInput[0].equals("highlight")) {
                 ChessPosition piecePos = new ChessPosition(Integer.parseInt(userInput[1]), Integer.parseInt(userInput[2]));
-                Collection<ChessMove> validMoves = currentGame.validMoves(piecePos);
+                printBoard(currentGame.getBoard(), piecePos);
+                // Collection<ChessMove> validMoves = currentGame.validMoves(piecePos);
             }
         }
     }
 
-    public void printBoard(ChessGame.TeamColor teamColor, ChessBoard chessBoard) {
+    public void printBoard(ChessBoard chessBoard, ChessPosition position) {
         if (teamColor == ChessGame.TeamColor.WHITE) {
-            printBoardWhite(chessBoard);
+            printBoardWhite(chessBoard, position);
         }
         else if (teamColor == ChessGame.TeamColor.BLACK) {
-            printBoardBlack(chessBoard);
+            printBoardBlack(chessBoard, position);
         }
     }
 
-    public static void printBoardBlack(ChessBoard board) {
+    public void printBoardBlack(ChessBoard board, ChessPosition position) {
+        Collection<ChessMove> validMoves = null;
+        if (position != null) {
+             validMoves = currentGame.validMoves(position);
+        }
         for (int i = 1; i <= 8; i += 1) {
             for (int j = 8; j >= 1; j -= 1) {
-                if ((i + j) % 2 == 0) {
-                    System.out.print("\u001b[39;44;1m");
+                if (validMoves != null) {
+                    if (validMoves.contains(new ChessMove(position, new ChessPosition(i, j), null))) {
+                        if ((i + j) % 2 == 0) {
+                            System.out.print("\u001b[39;42;1m");
+                        }
+                        else {
+                            System.out.print("\u001b[39;102;1m");
+                        }
+                    }
+                    else {
+                        if ((i + j) % 2 == 0) {
+                            System.out.print("\u001b[39;44;1m");
+                        } else {
+                            System.out.print("\u001b[39;41;1m");
+                        }
+                    }
                 }
                 else {
-                    System.out.print("\u001b[39;41;1m");
+                    if ((i + j) % 2 == 0) {
+                        System.out.print("\u001b[39;44;1m");
+                    } else {
+                        System.out.print("\u001b[39;41;1m");
+                    }
                 }
                 printPiece(board.getPiece(new ChessPosition(i ,j)));
             }
@@ -249,14 +286,36 @@ public class Repl implements GameHandler {
         }
     }
 
-    public static void printBoardWhite(ChessBoard board) {
+    public void printBoardWhite(ChessBoard board, ChessPosition position) {
+        Collection<ChessMove> validMoves = null;
+        if (position != null) {
+            validMoves = currentGame.validMoves(position);
+        }
         for (int i = 8; i >= 1; i -= 1) {
             for (int j = 1; j <= 8; j += 1) {
-                if ((i + j) % 2 == 0) {
-                    System.out.print("\u001b[39;44;1m");
+                if (validMoves != null) {
+                    if (validMoves.contains(new ChessMove(position, new ChessPosition(i, j), null))) {
+                        if ((i + j) % 2 == 0) {
+                            System.out.print("\u001b[39;42;1m");
+                        }
+                        else {
+                            System.out.print("\u001b[39;102;1m");
+                        }
+                    }
+                    else {
+                        if ((i + j) % 2 == 0) {
+                            System.out.print("\u001b[39;44;1m");
+                        } else {
+                            System.out.print("\u001b[39;41;1m");
+                        }
+                    }
                 }
                 else {
-                    System.out.print("\u001b[39;41;1m");
+                    if ((i + j) % 2 == 0) {
+                        System.out.print("\u001b[39;44;1m");
+                    } else {
+                        System.out.print("\u001b[39;41;1m");
+                    }
                 }
                 printPiece(board.getPiece(new ChessPosition(i ,j)));
             }
@@ -264,7 +323,7 @@ public class Repl implements GameHandler {
         }
     }
 
-    public static void printPiece(chess.ChessPiece piece) {
+    public void printPiece(chess.ChessPiece piece) {
         if (piece == null) {
             System.out.print(EMPTY);
         }

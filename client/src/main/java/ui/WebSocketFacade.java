@@ -2,13 +2,11 @@ package ui;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
+import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.LoadGame;
 import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
-import webSocketMessages.userCommands.JoinPlayer;
-import webSocketMessages.userCommands.Leave;
-import webSocketMessages.userCommands.MakeMove;
-import webSocketMessages.userCommands.Resign;
+import webSocketMessages.userCommands.*;
 
 import javax.websocket.*;
 import java.io.IOException;
@@ -32,7 +30,7 @@ public class WebSocketFacade extends Endpoint {
                 switch (serverMessage.getServerMessageType()) {
                     case LOAD_GAME -> gameHandler.updateGame(new Gson().fromJson(message, LoadGame.class).getGame());
                     case NOTIFICATION -> gameHandler.printMessage(new Gson().fromJson(message, Notification.class).getMessage());
-                    case ERROR -> gameHandler.printMessage(new Gson().fromJson(message, Notification.class).getMessage());
+                    case ERROR -> gameHandler.printMessage(new Gson().fromJson(message, Error.class).getErrorMessage());
                 }
             }
         });
@@ -55,6 +53,11 @@ public class WebSocketFacade extends Endpoint {
     public void resign(String authToken, int gameID) throws Exception {
         Gson gson = new Gson();
         send(gson.toJson(new Resign(authToken, gameID)));
+    }
+
+    public void joinObserver(String authToken, int gameID) throws Exception {
+        Gson gson = new Gson();
+        send(gson.toJson(new JoinObserver(authToken, gameID)));
     }
 
     public void send(String msg) throws Exception {

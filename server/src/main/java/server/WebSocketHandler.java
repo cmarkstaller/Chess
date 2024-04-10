@@ -120,13 +120,22 @@ public class WebSocketHandler {
             GameData gameData = gameDao.getGame(makeMove.getGameID());
             ChessGame chessGame = gameData.game();
 
+            if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) ||
+                    chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) ||
+                    chessGame.isInStalemate(ChessGame.TeamColor.WHITE) ||
+                    chessGame.isInStalemate(ChessGame.TeamColor.BLACK) ||
+                    chessGame.getTeamTurn() == ChessGame.TeamColor.GAMEOVER
+            ){
+                throw new InvalidMoveException("Tried to make move, but game is over error");
+            }
+
             if (getTeamColor(makeMove.getGameID(), username) == null) {
                 throw new InvalidMoveException("Can't make move as observer error");
             }
 
             // Tries to move wrong piece
             if (chessGame.getTeamTurn() != getTeamColor(makeMove.getGameID(), username)) {
-                throw new InvalidMoveException("Not your piece error");
+                throw new InvalidMoveException("Tried to move a piece that isn't yours error");
             }
             if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) ||
                     chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) ||
@@ -134,7 +143,7 @@ public class WebSocketHandler {
                     chessGame.isInStalemate(ChessGame.TeamColor.BLACK) ||
                     chessGame.getTeamTurn() == ChessGame.TeamColor.GAMEOVER
             ){
-                throw new InvalidMoveException("Ur Done error");
+                throw new InvalidMoveException("Tried to make move, but game is over error");
             }
 
             chessGame.makeMove(move);
@@ -145,9 +154,19 @@ public class WebSocketHandler {
             sendMessage(session, loadGameConstructor(makeMove.getGameID()));
             broadCastMessage(makeMove.getGameID(), loadGameConstructor(makeMove.getGameID()), makeMove.getAuthString());
 
+            if (chessGame.isInCheckmate(ChessGame.TeamColor.WHITE) ||
+                    chessGame.isInCheckmate(ChessGame.TeamColor.BLACK) ||
+                    chessGame.isInStalemate(ChessGame.TeamColor.WHITE) ||
+                    chessGame.isInStalemate(ChessGame.TeamColor.BLACK) ||
+                    chessGame.getTeamTurn() == ChessGame.TeamColor.GAMEOVER
+            ){
+                sendMessage(session, gson.toJson(new Notification(username + " Won the game!")));
+                broadCastMessage(makeMove.getGameID(), gson.toJson(new Notification(username + "Won the game!")), makeMove.getAuthString());
+            }
+
             broadCastMessage(makeMove.getGameID(), makeMoveNotification(makeMove.getChessMove()), makeMove.getAuthString());
         } catch (DataAccessException | InvalidMoveException e) {
-            sendMessage(session, gson.toJson(new Error("You've got mail, error")));
+            sendMessage(session, gson.toJson(new Error(e.getMessage())));
         }
     }
 
@@ -249,21 +268,21 @@ public class WebSocketHandler {
     private String joinPlayerNotification(String username, ChessGame.TeamColor teamColor) {
         String message;
         if (teamColor == ChessGame.TeamColor.WHITE) {
-            message = username + "has joined as white";
+            message = username + " has joined as white";
         }
         else if (teamColor == ChessGame.TeamColor.BLACK) {
-            message = username + "has joined as black";
+            message = username + " has joined as black";
         }
 
         else {
-            message = username + "has joined";
+            message = username + " has joined";
         }
         Gson gson = new Gson();
         return(gson.toJson(new Notification(message)));
     }
 
     private String joinObserverNotification(String username) {
-        String message = username + "has joined";
+        String message = username + " has joined";
 
         Gson gson = new Gson();
         return(gson.toJson(new Notification(message)));
