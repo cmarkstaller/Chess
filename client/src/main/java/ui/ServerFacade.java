@@ -46,12 +46,7 @@ public class ServerFacade {
                 myHappyFunction(http);
                 return;
             default:
-                try (InputStream errorStream = http.getErrorStream()) {
-                    InputStreamReader errorStreamReader = new InputStreamReader(errorStream);
-                    ResponseMessage errorResponse = new Gson().fromJson(errorStreamReader, ResponseMessage.class);
-
-                    throw new ClientExceptionWrapper(errorResponse.message());
-                }
+                mySadFunction(http);
         }
     }
 
@@ -83,12 +78,7 @@ public class ServerFacade {
                 myHappyFunction(http);
                 return;
             default:
-                try (InputStream errorStream = http.getErrorStream()) {
-                    InputStreamReader errorStreamReader = new InputStreamReader(errorStream);
-                    ResponseMessage errorResponse = new Gson().fromJson(errorStreamReader, ResponseMessage.class);
-
-                    throw new ClientExceptionWrapper(errorResponse.message());
-                }
+                mySadFunction(http);
         }
     }
 
@@ -114,12 +104,7 @@ public class ServerFacade {
             case 200:
                 return;
             default:
-                try (InputStream errorStream = http.getErrorStream()) {
-                    InputStreamReader errorStreamReader = new InputStreamReader(errorStream);
-                    ResponseMessage errorResponse = new Gson().fromJson(errorStreamReader, ResponseMessage.class);
-
-                    throw new ClientExceptionWrapper(errorResponse.message());
-                }
+                mySadFunction(http);
         }
     }
 
@@ -156,12 +141,8 @@ public class ServerFacade {
                 }
 
             default:
-                try (InputStream errorStream = http.getErrorStream()) {
-                    InputStreamReader errorStreamReader = new InputStreamReader(errorStream);
-                    ResponseMessage errorResponse = new Gson().fromJson(errorStreamReader, ResponseMessage.class);
-
-                    throw new ClientExceptionWrapper(errorResponse.message());
-                }
+                mySadFunction(http);
+                return(0);
         }
     }
 
@@ -191,12 +172,8 @@ public class ServerFacade {
                     return (games);
                 }
             default:
-                try (InputStream errorStream = http.getErrorStream()) {
-                    InputStreamReader errorStreamReader = new InputStreamReader(errorStream);
-                    ResponseMessage errorResponse = new Gson().fromJson(errorStreamReader, ResponseMessage.class);
-
-                    throw new ClientExceptionWrapper(errorResponse.message());
-                }
+                mySadFunction(http);
+                return(null);
         }
     }
 
@@ -228,12 +205,7 @@ public class ServerFacade {
             case 200:
                 return;
             default:
-                try (InputStream errorStream = http.getErrorStream()) {
-                    InputStreamReader errorStreamReader = new InputStreamReader(errorStream);
-                    ResponseMessage errorResponse = new Gson().fromJson(errorStreamReader, ResponseMessage.class);
-
-                    throw new ClientExceptionWrapper(errorResponse.message());
-                }
+                mySadFunction(http);
         }
     }
     public String getAuthToken() {
@@ -245,6 +217,15 @@ public class ServerFacade {
             InputStreamReader inputStreamReader = new InputStreamReader(respBody);
             AuthData authData = new Gson().fromJson(inputStreamReader, AuthData.class);
             authToken = authData.authToken();
+        }
+    }
+
+    private void mySadFunction(HttpURLConnection http) throws IOException, ClientExceptionWrapper {
+        try (InputStream errorStream = http.getErrorStream()) {
+            InputStreamReader errorStreamReader = new InputStreamReader(errorStream);
+            ResponseMessage errorResponse = new Gson().fromJson(errorStreamReader, ResponseMessage.class);
+
+            throw new ClientExceptionWrapper(errorResponse.message());
         }
     }
 }
