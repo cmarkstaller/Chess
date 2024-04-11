@@ -294,10 +294,5 @@ public class WebSocketHandler {
         Gson gson = new Gson();
         return(gson.toJson(new Notification(message)));
     }
-
-    private String resignNotification(String message) {
-        Gson gson = new Gson();
-        return(gson.toJson(new Notification(message)));
-    }
 }
 
