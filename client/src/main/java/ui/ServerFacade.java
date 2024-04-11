@@ -43,12 +43,8 @@ public class ServerFacade {
         int responseCode = http.getResponseCode();
         switch(responseCode) {
             case 200:
-                try (InputStream respBody = http.getInputStream()) {
-                    InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-                    AuthData authData = new Gson().fromJson(inputStreamReader, AuthData.class);
-                    authToken = authData.authToken();
-                    return;
-                }
+                myHappyFunction(http);
+                return;
             default:
                 try (InputStream errorStream = http.getErrorStream()) {
                     InputStreamReader errorStreamReader = new InputStreamReader(errorStream);
@@ -84,12 +80,8 @@ public class ServerFacade {
         int responseCode = http.getResponseCode();
         switch(responseCode) {
             case 200:
-                try (InputStream respBody = http.getInputStream()) {
-                    InputStreamReader inputStreamReader = new InputStreamReader(respBody);
-                    AuthData authData = new Gson().fromJson(inputStreamReader, AuthData.class);
-                    authToken = authData.authToken();
-                    return;
-                }
+                myHappyFunction(http);
+                return;
             default:
                 try (InputStream errorStream = http.getErrorStream()) {
                     InputStreamReader errorStreamReader = new InputStreamReader(errorStream);
@@ -248,4 +240,11 @@ public class ServerFacade {
         return(this.authToken);
     }
 
+    private void myHappyFunction(HttpURLConnection http) throws IOException {
+        try (InputStream respBody = http.getInputStream()) {
+            InputStreamReader inputStreamReader = new InputStreamReader(respBody);
+            AuthData authData = new Gson().fromJson(inputStreamReader, AuthData.class);
+            authToken = authData.authToken();
+        }
+    }
 }
