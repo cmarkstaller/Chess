@@ -31,9 +31,9 @@ public class ServerFacade {
         http.addRequestProperty("Content-Type", "application/json");
 
         // Write out the body
-        var body = new UserData(username, password, email);
+        //var body = new UserData(username, password, email);
         try (var outputStream = http.getOutputStream()) {
-            var jsonBody = new Gson().toJson(body);
+            var jsonBody = new Gson().toJson(new UserData(username, password, email));
             outputStream.write(jsonBody.getBytes());
         }
 
@@ -63,9 +63,9 @@ public class ServerFacade {
         http.addRequestProperty("Content-Type", "application/json");
 
         // Write out the body
-        var body = new LoginRequest(username, password);
+        //var body = new LoginRequest(username, password);
         try (var outputStream = http.getOutputStream()) {
-            var jsonBody = new Gson().toJson(body);
+            var jsonBody = new Gson().toJson(new LoginRequest(username, password));
             outputStream.write(jsonBody.getBytes());
         }
 
@@ -122,9 +122,9 @@ public class ServerFacade {
         http.addRequestProperty("Authorization", authToken);
 
         // Write out the body
-        var body = new CreateGameRequest(gameName);
+        //var body = new CreateGameRequest(gameName);
         try (var outputStream = http.getOutputStream()) {
-            var jsonBody = new Gson().toJson(body);
+            var jsonBody = new Gson().toJson(new CreateGameRequest(gameName));
             outputStream.write(jsonBody.getBytes());
         }
 
@@ -191,9 +191,9 @@ public class ServerFacade {
         http.addRequestProperty("Authorization", authToken);
 
         // Write out the body
-        var body = new JoinGameRequest(teamColor, gameID);
+        //var body = new JoinGameRequest(teamColor, gameID);
         try (var outputStream = http.getOutputStream()) {
-            var jsonBody = new Gson().toJson(body);
+            var jsonBody = new Gson().toJson(new JoinGameRequest(teamColor, gameID));
             outputStream.write(jsonBody.getBytes());
         }
 
